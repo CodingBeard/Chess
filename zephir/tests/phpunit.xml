@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="bootstrap.php"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         processIsolation="false"
+         stopOnFailure="true"
+         syntaxCheck="false">
+    <testsuites>
+        <testsuite name="stable">
+            <file>Pieces/PawnTest.php</file>
+            <file>Pieces/KnightTest.php</file>
+            <file>Board/SquareTest.php</file>
+            <file>Board/MoveTest.php</file>
+            <file>BoardTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>
