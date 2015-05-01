@@ -82,7 +82,7 @@ class Square
 
         let parts = json_decode(square);
 
-        if (0 > parts[0] > 7) || (0 > parts[1] > 7) {
+        if (0 > parts[0] && parts[0] > 7) || (0 > parts[1] && parts[1] > 7) {
             throw new \Exception(parts[0] . parts[1] . " is not a valid location.");
         }
 

@@ -81,7 +81,7 @@ class Board
     public function getSquare(const int x = -1, const int y = -1) -> <\CodingBeard\Chess\Board\Square>
     {
         if x != -1 && y != -1 {
-            if (0 > x > 7) || (0 > x > 7) {
+            if (0 > x && x > 7) || (0 > y && y > 7) {
                 throw new \Exception(strval(x) . strval(y) . " is not a valid location.");
             }
             return this->squares[x][y];

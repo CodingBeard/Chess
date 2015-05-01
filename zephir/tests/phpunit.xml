@@ -9,8 +9,12 @@
          syntaxCheck="false">
     <testsuites>
         <testsuite name="stable">
-            <file>Pieces/PawnTest.php</file>
+            <file>Pieces/KingTest.php</file>
+            <file>Pieces/QueenTest.php</file>
+            <file>Pieces/RookTest.php</file>
+            <file>Pieces/BishopTest.php</file>
             <file>Pieces/KnightTest.php</file>
+            <file>Pieces/PawnTest.php</file>
             <file>Board/SquareTest.php</file>
             <file>Board/MoveTest.php</file>
             <file>BoardTest.php</file>

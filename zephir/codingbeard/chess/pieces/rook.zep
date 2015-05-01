@@ -21,4 +21,20 @@ class Rook extends Piece
         get, set
     };
 
+    /**
+    * Constructor
+    * @param int colour
+    */
+    public function __construct(const int colour)
+    {
+        let this->range = 7;
+        let this->directions = [
+            [0, 1], //N
+            [1, 0], //E
+            [0, -1], //S
+            [-1, 0] //W
+        ];
+        let this->colour = colour;
+    }
+
 }

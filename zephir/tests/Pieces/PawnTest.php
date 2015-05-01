@@ -51,4 +51,33 @@ class PawnTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new Pawn(Piece::WHITE), $Pawn);
     }
 
+    /**
+     * @covers            \CodingBeard\Chess\Pieces\Piece::getMoves
+     * @uses              \CodingBeard\Chess\Pieces\Piece
+     */
+    public function testGetMoves()
+    {
+        $Pawn = new Pawn(Piece::WHITE);
+
+        $this->assertEquals([
+            [0, 1], [0, 2], [1, 1],
+        ], $Pawn->getMoves(0, 0));
+
+        $this->assertEquals([
+
+        ], $Pawn->getMoves(0, 7));
+
+        $this->assertEquals([
+
+        ], $Pawn->getMoves(7, 7));
+
+        $this->assertEquals([
+            [7, 1], [7, 2], [6, 1],
+        ], $Pawn->getMoves(7, 0));
+
+        $this->assertEquals([
+            [3, 5], [3, 6], [4, 5], [2, 5],
+        ], $Pawn->getMoves(3, 4));
+    }
+
 }

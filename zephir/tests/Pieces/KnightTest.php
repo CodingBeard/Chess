@@ -40,4 +40,33 @@ class KnightTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('[0,"Knight"]', $Knight->toString());
     }
 
+    /**
+     * @covers            \CodingBeard\Chess\Pieces\Piece::getMoves
+     * @uses              \CodingBeard\Chess\Pieces\Piece
+     */
+    public function testGetMoves()
+    {
+        $Knight = new Knight(Piece::WHITE);
+
+        $this->assertEquals([
+            [1, 2], [2, 1],
+        ], $Knight->getMoves(0, 0));
+
+        $this->assertEquals([
+            [2, 6], [1, 5],
+        ], $Knight->getMoves(0, 7));
+
+        $this->assertEquals([
+            [6, 5], [5, 6],
+        ], $Knight->getMoves(7, 7));
+
+        $this->assertEquals([
+            [5, 1], [6, 2],
+        ], $Knight->getMoves(7, 0));
+
+        $this->assertEquals([
+            [4, 6], [5, 5], [5, 3], [4, 2], [2, 2], [1, 3], [1, 5], [2, 6],
+        ], $Knight->getMoves(3, 4));
+    }
+
 }

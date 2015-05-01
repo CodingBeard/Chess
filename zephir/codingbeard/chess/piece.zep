@@ -26,17 +26,51 @@ abstract class Piece
         get, set
     };
 
+    /**
+    * @var int
+    */
+    public range {
+        get, set
+    };
+
+    /**
+    * @var array
+    */
+    public directions {
+        get, set
+    };
+
     const WHITE = 0;
 
     const BLACK = 1;
 
+
     /**
-    * Constructor
-    * @param int colour
+    * Return all the squares this piece could potentially move to
+    * @param int x
+    * @param int y
     */
-    public function __construct(const int colour)
+    public function getMoves(const int x, const int y) -> array
     {
-        let this->colour = colour;
+        array moves = [];
+        int distance = 1;
+        var direction;
+
+        for direction in this->directions {
+            while distance <= this->range {
+
+                if 8 > (x + (distance * direction[0])) && (x + (distance * direction[0])) > -1 {
+                    if 8 > (y + (distance * direction[1])) && (y + (distance * direction[1])) > -1 {
+                        let moves[] = [(x + (distance * direction[0])), (y + (distance * direction[1]))];
+                    }
+                }
+
+                let distance++;
+            }
+            let distance = 1;
+        }
+
+        return moves;
     }
 
     /**
