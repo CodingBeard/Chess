@@ -37,7 +37,7 @@ class KnightTest extends PHPUnit_Framework_TestCase
     {
         $Knight = new Knight(Piece::WHITE);
 
-        $this->assertEquals('0,Knight', $Knight->toString());
+        $this->assertEquals('[0,"Knight"]', $Knight->toString());
     }
 
 }

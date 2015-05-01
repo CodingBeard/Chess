@@ -1,4 +1,4 @@
-/*
+/**
  * Rook
  *
  * @category 
@@ -14,7 +14,7 @@ use CodingBeard\Chess\Piece;
 
 class Rook extends Piece
 {
-    /*
+    /**
     * @var string
     */
     public type = "Rook" {

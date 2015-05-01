@@ -1,8 +1,8 @@
-/*
+/**
  * Bishop
  *
- * @category 
- * @package 
+ * @category
+ * @package
  * @author Tim Marshall <Tim@CodingBeard.com>
  * @copyright (c) 2015, Tim Marshall
  * @license New BSD License
@@ -14,7 +14,7 @@ use CodingBeard\Chess\Piece;
 
 class Bishop extends Piece
 {
-    /*
+    /**
     * @var string
     */
     public type = "Bishop" {

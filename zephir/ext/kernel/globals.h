@@ -21,6 +21,8 @@
 #ifndef ZEPHIR_KERNEL_GLOBALS_H
 #define ZEPHIR_KERNEL_GLOBALS_H
 
+#include <php.h>
+
 #define ZEPHIR_MAX_MEMORY_STACK 48
 
 /** Memory frame */
@@ -140,6 +142,12 @@ typedef struct _zephir_function_cache {
 
 #ifndef __func__
 # define __func__ __FUNCTION__
+#endif
+
+#if defined(__GNUC__)
+# define ZEPHIR_NO_OPT __attribute__((optimize("O0")))
+#else
+# define ZEPHIR_NO_OPT 
 #endif
 
 /*#if PHP_VERSION_ID > 50399

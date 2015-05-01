@@ -13,6 +13,7 @@
 
 use CodingBeard\Chess\Board;
 use CodingBeard\Chess\Board\Square;
+use CodingBeard\Chess\Board\Move;
 use CodingBeard\Chess\Piece;
 use CodingBeard\Chess\Pieces\Bishop;
 use CodingBeard\Chess\Pieces\King;
@@ -147,7 +148,7 @@ class BoardTest extends PHPUnit_Framework_TestCase
 
         $board->setSquare(3, 4);
 
-        $this->assertEquals(new Square(3, 4, false), $board->getSquare());
+        $this->assertEquals(new Square(3, 4), $board->getSquare());
     }
 
     /**
@@ -161,6 +162,50 @@ class BoardTest extends PHPUnit_Framework_TestCase
         $board->startMove();
 
         $this->assertInstanceOf('CodingBeard\Chess\Board\Move', $board->getMove());
+    }
+
+    /**
+     * @covers            \CodingBeard\Chess\Board::executeMove
+     * @uses              \CodingBeard\Chess\Board
+     */
+    public function testExecuteMove()
+    {
+        $board = new Board();
+        $move = new Move(new Square(3, 0, new Queen(Piece::WHITE)), new Square(4, 4));
+        $board->executeMove($move);
+
+        $this->assertEquals(new Square(3, 0), $board->getSquare(3, 0));
+        $this->assertEquals(new Square(4, 4, new Queen(Piece::WHITE)), $board->getSquare(4, 4));
+
+    }
+
+    /**
+     * @covers            \CodingBeard\Chess\Board::printBoard
+     * @uses              \CodingBeard\Chess\Board
+     */
+    public function testPrintBoard()
+    {
+        $board = new Board();
+        $this->assertEquals(
+              "   | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |   " . PHP_EOL
+            . "-----------------------------------------------" . PHP_EOL
+            . "7  | bR | bK | bB | bQ | bK | bB | bK | bR |   7" . PHP_EOL
+            . "-----------------------------------------------" . PHP_EOL
+            . "6  | bP | bP | bP | bP | bP | bP | bP | bP |   6" . PHP_EOL
+            . "-----------------------------------------------" . PHP_EOL
+            . "5  |    |    |    |    |    |    |    |    |   5" . PHP_EOL
+            . "-----------------------------------------------" . PHP_EOL
+            . "4  |    |    |    |    |    |    |    |    |   4" . PHP_EOL
+            . "-----------------------------------------------" . PHP_EOL
+            . "3  |    |    |    |    |    |    |    |    |   3" . PHP_EOL
+            . "-----------------------------------------------" . PHP_EOL
+            . "2  |    |    |    |    |    |    |    |    |   2" . PHP_EOL
+            . "-----------------------------------------------" . PHP_EOL
+            . "1  | wP | wP | wP | wP | wP | wP | wP | wP |   1" . PHP_EOL
+            . "-----------------------------------------------" . PHP_EOL
+            . "0  | wR | wK | wB | wQ | wK | wB | wK | wR |   0" . PHP_EOL
+            . "-----------------------------------------------" . PHP_EOL
+            . "   | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |   " . PHP_EOL, $board->printBoard());
     }
 
     /**

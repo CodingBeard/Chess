@@ -1,4 +1,4 @@
-/*
+/**
  * Square
  *
  * @category 
@@ -14,34 +14,34 @@ use CodingBeard\Chess\Piece;
 
 class Square
 {
-    /*
+    /**
     * @var int
     */
     public x {
         get, set
     };
 
-    /*
+    /**
     * @var int
     */
     public y {
         get, set
     };
 
-    /*
+    /**
     * @var false|\CodingBeard\Chess\Piece
     */
     public piece = false {
         get, set
     };
 
-    /*
+    /**
     * Constructor
     * @param int x
     * @param int y
     * @param \CodingBeard\Chess\Piece piece
     */
-    public function __construct(const int x, const int y, const var piece = null)
+    public function __construct(const int x, const int y, const <\CodingBeard\Chess\Piece> piece = null)
     {
         let this->x = x;
         let this->y = y;
@@ -50,34 +50,55 @@ class Square
         }
     }
 
-    /*
+    /**
     * Stringify self
     */
-    public function toString() -> string
+    public function toString(const bool image = false) -> string
     {
+        if image {
+            if this->piece {
+                return this->piece->toString(true);
+            }
+            else {
+                return "  ";
+            }
+        }
+
         if this->piece {
-            return strval(this->x) . "," . strval(this->y) . ",'" . this->piece->toString() . "'";
+            return json_encode([this->x, this->y, [this->piece->getColour(), this->piece->getType()]]);
         }
         else {
-            return strval(this->x) . "," . strval(this->y) . ",";
+            return json_encode([this->x, this->y, []]);
         }
     }
 
-    /*
+    /**
     * Instance a square from its string representation
     * @param string square
     */
     public static function fromString(const string square) -> <\CodingBeard\Chess\Board\Square>
     {
-        var parts;
-        let parts = str_getcsv(square, ",", "'");
+        var parts = [], name, colour;
+
+        let parts = json_decode(square);
 
         if (0 > parts[0] > 7) || (0 > parts[1] > 7) {
             throw new \Exception(parts[0] . parts[1] . " is not a valid location.");
         }
 
-        if strlen(parts[2]) {
-            return new self(parts[0], parts[1], Piece::fromString(parts[2]));
+        if typeof parts[2] == "array" {
+
+            if parts[2][0] != Piece::WHITE && parts[2][0] != Piece::BLACK {
+                throw new \Exception(parts[2][0] . " is not a valid piece colour.");
+            }
+
+            if !in_array(parts[2][1], ["King", "Queen", "Rook", "Bishop", "Knight", "Pawn"]) {
+                throw new \Exception(parts[2][1] . " is not a valid piece type.");
+            }
+
+            let name = "\\CodingBeard\\Chess\\Pieces\\" . parts[2][1], colour = parts[2][0];
+
+            return new self(parts[0], parts[1], new {name}(colour));
         }
         else {
             return new self(parts[0], parts[1]);

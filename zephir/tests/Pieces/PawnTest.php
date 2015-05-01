@@ -37,7 +37,7 @@ class PawnTest extends PHPUnit_Framework_TestCase
     {
         $Pawn = new Pawn(Piece::WHITE);
 
-        $this->assertEquals('0,Pawn', $Pawn->toString());
+        $this->assertEquals('[0,"Pawn"]', $Pawn->toString());
     }
 
     /**
@@ -46,7 +46,7 @@ class PawnTest extends PHPUnit_Framework_TestCase
      */
     public function testFromString()
     {
-        $Pawn = Piece::fromString('0,Pawn');
+        $Pawn = Piece::fromString('[0,"Pawn"]');
 
         $this->assertEquals(new Pawn(Piece::WHITE), $Pawn);
     }

@@ -1,4 +1,4 @@
-/*
+/**
  * Piece
  *
  * @category 
@@ -12,14 +12,14 @@ namespace CodingBeard\Chess;
 
 abstract class Piece
 {
-    /*
+    /**
     * @var string
     */
     public type {
         get, set
     };
 
-    /*
+    /**
     * @var int
     */
     public colour {
@@ -30,7 +30,7 @@ abstract class Piece
 
     const BLACK = 1;
 
-    /*
+    /**
     * Constructor
     * @param int colour
     */
@@ -39,22 +39,30 @@ abstract class Piece
         let this->colour = colour;
     }
 
-    /*
+    /**
     * Stringify self
     */
-    public function toString() -> string
+    public function toString(const bool image = false) -> string
     {
-        return strval(this->colour) . "," . this->type;
+        if image {
+            if this->colour {
+                return "b" . substr(this->type, 0, 1);
+            }
+            else {
+                return "w" . substr(this->type, 0, 1);
+            }
+        }
+        return json_encode([this->colour, this->type]);
     }
 
-    /*
+    /**
     * Instance a piece from its string representation
     * @param string piece
     */
     public static function fromString(const string piece) -> <\CodingBeard\Chess\Piece>
     {
-        var parts, name, colour;
-        let parts = str_getcsv(piece, ",", "'");
+        var parts = [], name, colour;
+        let parts = json_decode(piece);
 
         if parts[0] != self::WHITE && parts[0] != self::BLACK {
             throw new \Exception(parts[0] . " is not a valid piece colour.");

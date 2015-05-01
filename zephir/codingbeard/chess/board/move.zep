@@ -1,4 +1,4 @@
-/*
+/**
  * Move
  *
  * @category 
@@ -12,35 +12,35 @@ namespace CodingBeard\Chess\Board;
 
 class Move
 {
-    /*
+    /**
     * @var \CodingBeard\Chess\Board\Square
     */
     public from {
         get
     };
 
-    /*
+    /**
     * @var \CodingBeard\Chess\Board\Square
     */
     public to {
         get
     };
 
-    /*
+    /**
     * @var bool
     */
     public noClip = false {
         get, set
     };
 
-    /*
+    /**
     * @var bool
     */
     public obstacle = false {
         get, set
     };
 
-    /*
+    /**
     * Constructor
     * @param \CodingBeard\Chess\Board\Move from
     * @param \CodingBeard\Chess\Board\Move to
@@ -64,7 +64,7 @@ class Move
         }
     }
 
-    /*
+    /**
     * @param \CodingBeard\Chess\Board\Move from
     */
     public function setFrom(const <\CodingBeard\Chess\Board\Square> from)
@@ -77,7 +77,7 @@ class Move
         let this->from = from;
     }
 
-    /*
+    /**
     * @param \CodingBeard\Chess\Board\Move to
     */
     public function setTo(const <\CodingBeard\Chess\Board\Square> to)

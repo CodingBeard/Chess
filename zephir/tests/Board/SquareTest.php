@@ -42,7 +42,7 @@ class SquareTest extends PHPUnit_Framework_TestCase
     {
         $Pawn = new Square(0, 1, new Pawn(Piece::WHITE));
 
-        $this->assertEquals("0,1,'0,Pawn'", $Pawn->toString());
+        $this->assertEquals('[0,1,[0,"Pawn"]]', $Pawn->toString());
     }
 
     /**
@@ -51,7 +51,7 @@ class SquareTest extends PHPUnit_Framework_TestCase
      */
     public function testFromString()
     {
-        $Square = Square::fromString("0,1,'0,Pawn'");
+        $Square = Square::fromString('[0,1,[0,"Pawn"]]');
 
         $this->assertEquals(new Square(0, 1, new Pawn(Piece::WHITE)), $Square);
     }
