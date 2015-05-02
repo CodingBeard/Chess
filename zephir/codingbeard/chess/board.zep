@@ -55,6 +55,7 @@ class Board
 
     /**
     * Constructor
+    * @param bool blank whether to generate a blank board or not
     */
     public function __construct(const bool blank = false)
     {
@@ -76,21 +77,23 @@ class Board
     }
 
     /**
-    * Get the square at the current location
+    * Get the square at a location
+    * @param int x
+    * @param int y
     */
-    public function getSquare(const int x = -1, const int y = -1) -> <\CodingBeard\Chess\Board\Square>
+    public function getSquare(const int x, const int y) -> <\CodingBeard\Chess\Board\Square>
     {
-        if x != -1 && y != -1 {
-            if (0 > x && x > 7) || (0 > y && y > 7) {
-                throw new \Exception(strval(x) . strval(y) . " is not a valid location.");
-            }
-            return this->squares[x][y];
+        if (0 > x && x > 7) || (0 > y && y > 7) {
+            throw new \Exception(strval(x) . strval(y) . " is not a valid location.");
         }
-        return this->squares[this->location[0]][this->location[1]];
+        return this->squares[x][y];
     }
 
     /**
-    * Set a square
+    * Set a square at a location
+    * @param int x
+    * @param int y
+    * @param \CodingBeard\Chess\Piece piece
     */
     public function setSquare(const int x, const int y, const var piece = false) -> <\CodingBeard\Chess\Board>
     {
@@ -99,27 +102,69 @@ class Board
     }
 
     /**
-    * Get the square at the current location
+    * Get the moves of a piece at a location
+    * @param int x
+    * @param int y
     */
-    public function startMove() -> <\CodingBeard\Chess\Board>
+    public function getMoves(const int x, const int y) -> bool|array
     {
-        let this->move = new Move(this->getSquare());
+        var from, to, direction, location;
+        array moves;
+
+        let from = this->getSquare(x, y);
+
+        if from->getPiece() {
+            let moves = [];
+
+            for direction in from->getPiece()->getPotentialMoves(x, y) {
+
+                for location in direction {
+
+                    let to = this->getSquare(location[0], location[1]);
+
+                    if !to->getPiece() {
+                        let moves[] = new Move(from, to);
+                    }
+                    else {
+                        if from->getPiece()->getColour() != to->getPiece()->getColour() {
+                            let moves[] = new Move(from, to);
+                            break;
+                        }
+                        else {
+                            if from->getPiece()->specialMove(from, to) {
+                                let moves[] = new Move(from, to);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            return moves;
+        }
+        else {
+            return false;
+        }
+    }
+
+    /**
+    * Make a move on the board
+    * @param \CodingBeard\Chess\Board\Move move
+    */
+    public function makeMove(const <\CodingBeard\Chess\Board\Move> move) -> <\CodingBeard\Chess\Board>
+    {
+        this->setSquare(move->getTo()->getX(), move->getTo()->getY(), move->getFrom()->getPiece());
+        this->setSquare(move->getFrom()->getX(), move->getFrom()->getY(), false);
         return this;
     }
 
     /**
-    * Execute a move on the board
+    * Make a move on the board
     * @param \CodingBeard\Chess\Board\Move move
     */
-    public function executeMove(const <\CodingBeard\Chess\Board\Move> move) -> <\CodingBeard\Chess\Board>
+    public function undoMove(const <\CodingBeard\Chess\Board\Move> move) -> <\CodingBeard\Chess\Board>
     {
-        if move {
-            if !move->getTo() {
-                move->setTo(this->getSquare());
-            }
-            this->setSquare(move->getTo()->getX(), move->getTo()->getY(), move->getFrom()->getPiece());
-            this->setSquare(move->getFrom()->getX(), move->getFrom()->getY(), false);
-        }
+        this->setSquare(move->getTo()->getX(), move->getTo()->getY(), move->getTo()->getPiece());
+        this->setSquare(move->getFrom()->getX(), move->getFrom()->getY(), move->getFrom()->getPiece());
         return this;
     }
 
@@ -148,122 +193,6 @@ class Board
         let board .= "-----------------------------------------------" . PHP_EOL;
         let board .= "   | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |   " . PHP_EOL;
         return board;
-    }
-
-    /**
-    * Move one square north
-    */
-    public function north() -> <\CodingBeard\Chess\Board>
-    {
-        if this->location[1] < 7 {
-            let this->location[1] = this->location[1] + 1;
-            if this->move {
-                this->move->setTo(this->getSquare());
-            }
-        }
-        return this;
-    }
-
-    /**
-    * Move one square north east
-    */
-    public function northeast() -> <\CodingBeard\Chess\Board>
-    {
-        if this->location[0] < 7 && this->location[1] < 7 {
-            let this->location[0] = this->location[0] + 1;
-            let this->location[1] = this->location[1] + 1;
-            if this->move {
-                this->move->setTo(this->getSquare());
-            }
-        }
-        return this;
-    }
-
-    /**
-    * Move one square east
-    */
-    public function east() -> <\CodingBeard\Chess\Board>
-    {
-        if this->location[0] < 7 {
-            let this->location[0] = this->location[0] + 1;
-            if this->move {
-                this->move->setTo(this->getSquare());
-            }
-        }
-        return this;
-    }
-
-    /**
-    * Move one square south east
-    */
-    public function southeast() -> <\CodingBeard\Chess\Board>
-    {
-        if this->location[0] < 7 && this->location[1] > 0 {
-            let this->location[0] = this->location[0] + 1;
-            let this->location[1] = this->location[1] - 1;
-            if this->move {
-                this->move->setTo(this->getSquare());
-            }
-        }
-        return this;
-    }
-
-    /**
-    * Move one square south
-    */
-    public function south() -> <\CodingBeard\Chess\Board>
-    {
-        if this->location[1] > 0 {
-            let this->location[1] = this->location[1] - 1;
-            if this->move {
-                this->move->setTo(this->getSquare());
-            }
-        }
-        return this;
-    }
-
-    /**
-    * Move one square south west
-    */
-    public function southwest() -> <\CodingBeard\Chess\Board>
-    {
-        if this->location[0] > 0 && this->location[1] > 0 {
-            let this->location[0] = this->location[0] - 1;
-            let this->location[1] = this->location[1] - 1;
-            if this->move {
-                this->move->setTo(this->getSquare());
-            }
-        }
-        return this;
-    }
-
-    /**
-    * Move one square west
-    */
-    public function west() -> <\CodingBeard\Chess\Board>
-    {
-        if this->location[0] > 0 {
-            let this->location[0] = this->location[0] - 1;
-            if this->move {
-                this->move->setTo(this->getSquare());
-            }
-        }
-        return this;
-    }
-
-    /**
-    * Move one square north west
-    */
-    public function northwest() -> <\CodingBeard\Chess\Board>
-    {
-        if this->location[0] > 0 && this->location[1] < 7 {
-            let this->location[0] = this->location[0] - 1;
-            let this->location[1] = this->location[1] + 1;
-            if this->move {
-                this->move->setTo(this->getSquare());
-            }
-        }
-        return this;
     }
 
 }

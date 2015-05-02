@@ -30,8 +30,8 @@ class PawnTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers            \CodingBeard\Chess\Pieces\Piece::toString
-     * @uses              \CodingBeard\Chess\Pieces\Piece
+     * @covers            \CodingBeard\Chess\Piece::toString
+     * @uses              \CodingBeard\Chess\Piece
      */
     public function testToString()
     {
@@ -41,8 +41,8 @@ class PawnTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers            \CodingBeard\Chess\Pieces\Piece::fromString
-     * @uses              \CodingBeard\Chess\Pieces\Piece
+     * @covers            \CodingBeard\Chess\Piece::fromString
+     * @uses              \CodingBeard\Chess\Piece
      */
     public function testFromString()
     {
@@ -52,32 +52,28 @@ class PawnTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers            \CodingBeard\Chess\Pieces\Piece::getMoves
-     * @uses              \CodingBeard\Chess\Pieces\Piece
+     * @covers            \CodingBeard\Chess\Piece::GetPotentialMoves
+     * @uses              \CodingBeard\Chess\Piece
      */
-    public function testGetMoves()
+    public function testGetPotentialMoves()
     {
         $Pawn = new Pawn(Piece::WHITE);
 
         $this->assertEquals([
-            [0, 1], [0, 2], [1, 1],
-        ], $Pawn->getMoves(0, 0));
+            [[0, 1]], [[0, 2]], [[1, 1]],
+        ], $Pawn->getPotentialMoves(0, 0));
+
+        $this->assertEquals([], $Pawn->getPotentialMoves(0, 7));
+
+        $this->assertEquals([], $Pawn->getPotentialMoves(7, 7));
 
         $this->assertEquals([
-
-        ], $Pawn->getMoves(0, 7));
-
-        $this->assertEquals([
-
-        ], $Pawn->getMoves(7, 7));
+            [[7, 1]], [[7, 2]], [[6, 1]],
+        ], $Pawn->getPotentialMoves(7, 0));
 
         $this->assertEquals([
-            [7, 1], [7, 2], [6, 1],
-        ], $Pawn->getMoves(7, 0));
-
-        $this->assertEquals([
-            [3, 5], [3, 6], [4, 5], [2, 5],
-        ], $Pawn->getMoves(3, 4));
+            [[3, 5]], [[3, 6]], [[4, 5]], [[2, 5]],
+        ], $Pawn->getPotentialMoves(3, 4));
     }
 
 }

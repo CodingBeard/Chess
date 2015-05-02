@@ -127,11 +127,8 @@ class BoardTest extends PHPUnit_Framework_TestCase
     {
         $board = new Board();
 
-        $this->assertEquals(new Square(0, 0, new Rook(Piece::WHITE)), $board->getSquare());
-
-        $board->setLocation([2, 5]);
-
-        $this->assertEquals(new Square(2, 5), $board->getSquare());
+        $this->assertEquals(new Square(0, 0, new Rook(Piece::WHITE)), $board->getSquare(0, 0));
+        $this->assertEquals(new Square(2, 5), $board->getSquare(2, 5));
     }
 
     /**
@@ -142,37 +139,23 @@ class BoardTest extends PHPUnit_Framework_TestCase
     {
         $board = new Board();
         $board->setSquare(3, 4, new Queen(Piece::WHITE));
-        $board->setLocation([3, 4]);
 
-        $this->assertEquals(new Square(3, 4, new Queen(Piece::WHITE)), $board->getSquare());
+        $this->assertEquals(new Square(3, 4, new Queen(Piece::WHITE)), $board->getSquare(3, 4));
 
         $board->setSquare(3, 4);
 
-        $this->assertEquals(new Square(3, 4), $board->getSquare());
+        $this->assertEquals(new Square(3, 4), $board->getSquare(3, 4));
     }
 
     /**
-     * @covers            \CodingBeard\Chess\Board::startMove
+     * @covers            \CodingBeard\Chess\Board::makeMove
      * @uses              \CodingBeard\Chess\Board
      */
-    public function testStartMove()
-    {
-        $board = new Board();
-
-        $board->startMove();
-
-        $this->assertInstanceOf('CodingBeard\Chess\Board\Move', $board->getMove());
-    }
-
-    /**
-     * @covers            \CodingBeard\Chess\Board::executeMove
-     * @uses              \CodingBeard\Chess\Board
-     */
-    public function testExecuteMove()
+    public function testMakeMove()
     {
         $board = new Board();
         $move = new Move(new Square(3, 0, new Queen(Piece::WHITE)), new Square(4, 4));
-        $board->executeMove($move);
+        $board->makeMove($move);
 
         $this->assertEquals(new Square(3, 0), $board->getSquare(3, 0));
         $this->assertEquals(new Square(4, 4, new Queen(Piece::WHITE)), $board->getSquare(4, 4));
@@ -206,171 +189,6 @@ class BoardTest extends PHPUnit_Framework_TestCase
             . "0  | wR | wK | wB | wQ | wK | wB | wK | wR |   0" . PHP_EOL
             . "-----------------------------------------------" . PHP_EOL
             . "   | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |   " . PHP_EOL, $board->printBoard());
-    }
-
-    /**
-     * @covers            \CodingBeard\Chess\Board::north
-     * @uses              \CodingBeard\Chess\Board
-     */
-    public function testNorth()
-    {
-        $board = new Board();
-        $board->north();
-
-        $this->assertEquals([0, 1], $board->getLocation());
-
-        $board->north()->north();
-
-        $this->assertEquals([0, 3], $board->getLocation());
-
-        $board->north()->north()->north()->north()->north()->north();
-
-        $this->assertEquals([0, 7], $board->getLocation());
-    }
-
-    /**
-     * @covers            \CodingBeard\Chess\Board::northeast
-     * @uses              \CodingBeard\Chess\Board
-     */
-    public function testNortheast()
-    {
-        $board = new Board();
-        $board->northeast();
-
-        $this->assertEquals([1, 1], $board->getLocation());
-
-        $board->northeast()->northeast();
-
-        $this->assertEquals([3, 3], $board->getLocation());
-
-        $board->northeast()->northeast()->northeast()->northeast()->northeast()->northeast();
-
-        $this->assertEquals([7, 7], $board->getLocation());
-    }
-
-    /**
-     * @covers            \CodingBeard\Chess\Board::east
-     * @uses              \CodingBeard\Chess\Board
-     */
-    public function testEast()
-    {
-        $board = new Board();
-        $board->east();
-
-        $this->assertEquals([1, 0], $board->getLocation());
-
-        $board->east()->east();
-
-        $this->assertEquals([3, 0], $board->getLocation());
-
-        $board->east()->east()->east()->east()->east()->east();
-
-        $this->assertEquals([7, 0], $board->getLocation());
-    }
-
-    /**
-     * @covers            \CodingBeard\Chess\Board::southeast
-     * @uses              \CodingBeard\Chess\Board
-     */
-    public function testSoutheast()
-    {
-        $board = new Board();
-        $board->setLocation([0, 7]);
-        $board->southeast();
-
-        $this->assertEquals([1, 6], $board->getLocation());
-
-        $board->southeast()->southeast();
-
-        $this->assertEquals([3, 4], $board->getLocation());
-
-        $board->southeast()->southeast()->southeast()->southeast()->southeast()->southeast();
-
-        $this->assertEquals([7, 0], $board->getLocation());
-    }
-
-    /**
-     * @covers            \CodingBeard\Chess\Board::south
-     * @uses              \CodingBeard\Chess\Board
-     */
-    public function testSouth()
-    {
-        $board = new Board();
-        $board->setLocation([0, 7]);
-        $board->south();
-
-        $this->assertEquals([0, 6], $board->getLocation());
-
-        $board->south()->south();
-
-        $this->assertEquals([0, 4], $board->getLocation());
-
-        $board->south()->south()->south()->south()->south()->south();
-
-        $this->assertEquals([0, 0], $board->getLocation());
-    }
-
-    /**
-     * @covers            \CodingBeard\Chess\Board::southwest
-     * @uses              \CodingBeard\Chess\Board
-     */
-    public function testSouthwest()
-    {
-        $board = new Board();
-        $board->setLocation([7, 7]);
-        $board->southwest();
-
-        $this->assertEquals([6, 6], $board->getLocation());
-
-        $board->southwest()->southwest();
-
-        $this->assertEquals([4, 4], $board->getLocation());
-
-        $board->southwest()->southwest()->southwest()->southwest()->southwest()->southwest();
-
-        $this->assertEquals([0, 0], $board->getLocation());
-    }
-
-    /**
-     * @covers            \CodingBeard\Chess\Board::west
-     * @uses              \CodingBeard\Chess\Board
-     */
-    public function testWest()
-    {
-        $board = new Board();
-        $board->setLocation([7, 0]);
-        $board->west();
-
-        $this->assertEquals([6, 0], $board->getLocation());
-
-        $board->west()->west();
-
-        $this->assertEquals([4, 0], $board->getLocation());
-
-        $board->west()->west()->west()->west()->west()->west();
-
-        $this->assertEquals([0, 0], $board->getLocation());
-    }
-
-    /**
-     * @covers            \CodingBeard\Chess\Board::northwest
-     * @uses              \CodingBeard\Chess\Board
-     */
-    public function testNorthwest()
-    {
-        $board = new Board();
-        $board->setLocation([7, 0]);
-        $board->northwest();
-
-        $this->assertEquals([6, 1], $board->getLocation());
-
-        $board->northwest()->northwest();
-
-        $this->assertEquals([4, 3], $board->getLocation());
-
-        $board->northwest()->northwest()->northwest()->northwest()->northwest()->northwest();
-
-        $this->assertEquals([0, 7], $board->getLocation());
     }
 
 }

@@ -30,8 +30,8 @@ class BishopTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers            \CodingBeard\Chess\Pieces\Piece::toString
-     * @uses              \CodingBeard\Chess\Pieces\Piece
+     * @covers            \CodingBeard\Chess\Piece::toString
+     * @uses              \CodingBeard\Chess\Piece
      */
     public function testToString()
     {
@@ -41,8 +41,8 @@ class BishopTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers            \CodingBeard\Chess\Pieces\Piece::fromString
-     * @uses              \CodingBeard\Chess\Pieces\Piece
+     * @covers            \CodingBeard\Chess\Piece::fromString
+     * @uses              \CodingBeard\Chess\Piece
      */
     public function testFromString()
     {
@@ -52,23 +52,23 @@ class BishopTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers            \CodingBeard\Chess\Pieces\Piece::getMoves
-     * @uses              \CodingBeard\Chess\Pieces\Piece
+     * @covers            \CodingBeard\Chess\Piece::GetPotentialMoves
+     * @uses              \CodingBeard\Chess\Piece
      */
-    public function testGetMoves()
+    public function testGetPotentialMoves()
     {
         $Bishop = new Bishop(Piece::WHITE);
 
-        $this->assertEquals([[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7],], $Bishop->getMoves(0, 0));
-        $this->assertEquals([[1, 6], [2, 5], [3, 4], [4, 3], [5, 2], [6, 1], [7, 0],], $Bishop->getMoves(0, 7));
-        $this->assertEquals([[6, 6], [5, 5], [4, 4], [3, 3], [2, 2], [1, 1], [0, 0],], $Bishop->getMoves(7, 7));
-        $this->assertEquals([[6, 1], [5, 2], [4, 3], [3, 4], [2, 5], [1, 6], [0, 7],], $Bishop->getMoves(7, 0));
+        $this->assertEquals([[[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7],]], $Bishop->getPotentialMoves(0, 0));
+        $this->assertEquals([[[1, 6], [2, 5], [3, 4], [4, 3], [5, 2], [6, 1], [7, 0],]], $Bishop->getPotentialMoves(0, 7));
+        $this->assertEquals([[[6, 6], [5, 5], [4, 4], [3, 3], [2, 2], [1, 1], [0, 0],]], $Bishop->getPotentialMoves(7, 7));
+        $this->assertEquals([[[6, 1], [5, 2], [4, 3], [3, 4], [2, 5], [1, 6], [0, 7],]], $Bishop->getPotentialMoves(7, 0));
 
         $this->assertEquals([
-            [4, 5], [5, 6], [6, 7],
-            [4, 3], [5, 2], [6, 1], [7, 0],
-            [2, 3], [1, 2], [0, 1],
-            [2, 5], [1, 6], [0, 7],
-        ], $Bishop->getMoves(3, 4));
+            [[4, 5], [5, 6], [6, 7]],
+            [[4, 3], [5, 2], [6, 1], [7, 0]],
+            [[2, 3], [1, 2], [0, 1]],
+            [[2, 5], [1, 6], [0, 7]],
+        ], $Bishop->getPotentialMoves(3, 4));
     }
 }

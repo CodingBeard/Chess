@@ -41,32 +41,32 @@ class KnightTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers            \CodingBeard\Chess\Pieces\Piece::getMoves
-     * @uses              \CodingBeard\Chess\Pieces\Piece
+     * @covers            \CodingBeard\Chess\Piece::GetPotentialMoves
+     * @uses              \CodingBeard\Chess\Piece
      */
-    public function testGetMoves()
+    public function testGetPotentialMoves()
     {
         $Knight = new Knight(Piece::WHITE);
 
         $this->assertEquals([
-            [1, 2], [2, 1],
-        ], $Knight->getMoves(0, 0));
+            [[1, 2]], [[2, 1]],
+        ], $Knight->getPotentialMoves(0, 0));
 
         $this->assertEquals([
-            [2, 6], [1, 5],
-        ], $Knight->getMoves(0, 7));
+            [[2, 6]], [[1, 5]],
+        ], $Knight->getPotentialMoves(0, 7));
 
         $this->assertEquals([
-            [6, 5], [5, 6],
-        ], $Knight->getMoves(7, 7));
+            [[6, 5]], [[5, 6]],
+        ], $Knight->getPotentialMoves(7, 7));
 
         $this->assertEquals([
-            [5, 1], [6, 2],
-        ], $Knight->getMoves(7, 0));
+            [[5, 1]], [[6, 2]],
+        ], $Knight->getPotentialMoves(7, 0));
 
         $this->assertEquals([
-            [4, 6], [5, 5], [5, 3], [4, 2], [2, 2], [1, 3], [1, 5], [2, 6],
-        ], $Knight->getMoves(3, 4));
+            [[4, 6]], [[5, 5]], [[5, 3]], [[4, 2]], [[2, 2]], [[1, 3]], [[1, 5]], [[2, 6]],
+        ], $Knight->getPotentialMoves(3, 4));
     }
 
 }

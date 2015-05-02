@@ -30,8 +30,8 @@ class KingTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers            \CodingBeard\Chess\Pieces\Piece::toString
-     * @uses              \CodingBeard\Chess\Pieces\Piece
+     * @covers            \CodingBeard\Chess\Piece::toString
+     * @uses              \CodingBeard\Chess\Piece
      */
     public function testToString()
     {
@@ -41,8 +41,8 @@ class KingTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers            \CodingBeard\Chess\Pieces\Piece::fromString
-     * @uses              \CodingBeard\Chess\Pieces\Piece
+     * @covers            \CodingBeard\Chess\Piece::fromString
+     * @uses              \CodingBeard\Chess\Piece
      */
     public function testFromString()
     {
@@ -52,20 +52,20 @@ class KingTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers            \CodingBeard\Chess\Pieces\Piece::getMoves
-     * @uses              \CodingBeard\Chess\Pieces\Piece
+     * @covers            \CodingBeard\Chess\Piece::GetPotentialMoves
+     * @uses              \CodingBeard\Chess\Piece
      */
-    public function testGetMoves()
+    public function testGetPotentialMoves()
     {
         $King = new King(Piece::WHITE);
 
-        $this->assertEquals([[0, 1], [1, 1], [1, 0]], $King->getMoves(0, 0));
-        $this->assertEquals([[1, 7], [1, 6], [0, 6]], $King->getMoves(0, 7));
-        $this->assertEquals([[7, 6], [6, 6], [6, 7]], $King->getMoves(7, 7));
-        $this->assertEquals([[7, 1], [6, 0], [6, 1]], $King->getMoves(7, 0));
+        $this->assertEquals([[[0, 1]], [[1, 1]], [[1, 0]]], $King->getPotentialMoves(0, 0));
+        $this->assertEquals([[[1, 7]], [[1, 6]], [[0, 6]]], $King->getPotentialMoves(0, 7));
+        $this->assertEquals([[[7, 6]], [[6, 6]], [[6, 7]]], $King->getPotentialMoves(7, 7));
+        $this->assertEquals([[[7, 1]], [[6, 0]], [[6, 1]]], $King->getPotentialMoves(7, 0));
 
         $this->assertEquals([
-            [3, 5], [4, 5], [4, 4], [4, 3], [3, 3], [2, 3], [2, 4], [2, 5],
-        ], $King->getMoves(3, 4));
+            [[3, 5]], [[4, 5]], [[4, 4]], [[4, 3]], [[3, 3]], [[2, 3]], [[2, 4]], [[2, 5]],
+        ], $King->getPotentialMoves(3, 4));
     }
 }

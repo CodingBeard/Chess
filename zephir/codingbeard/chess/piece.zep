@@ -50,18 +50,19 @@ abstract class Piece
     * @param int x
     * @param int y
     */
-    public function getMoves(const int x, const int y) -> array
+    public function getPotentialMoves(const int x, const int y) -> array
     {
-        array moves = [];
+        array moves;
         int distance = 1;
-        var direction;
+        var direction, key;
 
-        for direction in this->directions {
+        let moves = [];
+        for key, direction in this->directions {
             while distance <= this->range {
 
                 if 8 > (x + (distance * direction[0])) && (x + (distance * direction[0])) > -1 {
                     if 8 > (y + (distance * direction[1])) && (y + (distance * direction[1])) > -1 {
-                        let moves[] = [(x + (distance * direction[0])), (y + (distance * direction[1]))];
+                        let moves[key][] = [(x + (distance * direction[0])), (y + (distance * direction[1]))];
                     }
                 }
 
@@ -69,8 +70,18 @@ abstract class Piece
             }
             let distance = 1;
         }
+        return array_values(moves);
+    }
 
-        return moves;
+
+    /**
+    * Return all the squares this piece could potentially move to
+    * @param \CodingBeard\Chess\Board\Square from
+    * @param \CodingBeard\Chess\Board\Square to
+    */
+    public function specialMove(const <\CodingBeard\Chess\Board\Square> from, const <\CodingBeard\Chess\Board\Square> to) -> bool
+    {
+        return false;
     }
 
     /**
