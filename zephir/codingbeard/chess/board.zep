@@ -38,22 +38,6 @@ class Board
     };
 
     /**
-    * xy location of the current square
-    * @var array
-    */
-    public location = [0, 0] {
-        get, set
-    };
-
-    /**
-    * Current move
-    * @var bool|CodingBeard\Chess\Board\Move
-    */
-    public move = false {
-        get, set
-    };
-
-    /**
     * Constructor
     * @param bool blank whether to generate a blank board or not
     */
@@ -130,7 +114,6 @@ class Board
                         break;
                     }
                 }
-
             }
             return moves;
         }
@@ -143,22 +126,28 @@ class Board
     * Make a move on the board
     * @param \CodingBeard\Chess\Board\Move move
     */
-    public function makeMove(const <\CodingBeard\Chess\Board\Move> move) -> <\CodingBeard\Chess\Board>
+    public function makeMove(const <\CodingBeard\Chess\Board\Move> move)
     {
+        if move->getDoubleMove() {
+            this->makeMove(move->getDoubleMove());
+        }
+
         this->setSquare(move->getTo()->getX(), move->getTo()->getY(), move->getFrom()->getPiece());
         this->setSquare(move->getFrom()->getX(), move->getFrom()->getY(), false);
-        return this;
     }
 
     /**
     * Make a move on the board
     * @param \CodingBeard\Chess\Board\Move move
     */
-    public function undoMove(const <\CodingBeard\Chess\Board\Move> move) -> <\CodingBeard\Chess\Board>
+    public function undoMove(const <\CodingBeard\Chess\Board\Move> move)
     {
         this->setSquare(move->getTo()->getX(), move->getTo()->getY(), move->getTo()->getPiece());
         this->setSquare(move->getFrom()->getX(), move->getFrom()->getY(), move->getFrom()->getPiece());
-        return this;
+
+        if move->getDoubleMove() {
+            this->undoMove(move->getDoubleMove());
+        }
     }
 
     /**
@@ -169,7 +158,7 @@ class Board
         string board = "";
         int x = 0, y = 7;
 
-        let board .=  "   | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |   " . PHP_EOL;
+        let board .=  PHP_EOL . "   | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |   " . PHP_EOL;
 
         while y > -1 {
             let x = 0;

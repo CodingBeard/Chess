@@ -18,6 +18,8 @@
             <file>Pieces/PawnTest.php</file>
             <file>Board/MoveTest.php</file>
             <file>BoardTest.php</file>
+            <file>Board/CastlingTest.php</file>
+            <file>Board/PassantTest.php</file>
             <file>Board/testGetMoves/KingTest.php</file>
             <file>Board/testGetMoves/QueenTest.php</file>
             <file>Board/testGetMoves/BishopTest.php</file>

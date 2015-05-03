@@ -10,33 +10,37 @@
 
 namespace CodingBeard\Chess\Board;
 
+use CodingBeard\Chess\Piece;
+use CodingBeard\Chess\Pieces\Rook;
+use CodingBeard\Chess\Pieces\Pawn;
+
 class Move
 {
     /**
     * @var \CodingBeard\Chess\Board\Square
     */
     public from {
-        get
+        get, set
     };
 
     /**
     * @var \CodingBeard\Chess\Board\Square
     */
     public to {
-        get
+        get, set
     };
 
     /**
-    * @var bool
+    * @var bool|\CodingBeard\Chess\Board\Move
     */
-    public noClip = false {
+    public doubleMove = false {
         get, set
     };
 
     /**
     * @var bool
     */
-    public obstacle = false {
+    public attack = false {
         get, set
     };
 
@@ -46,47 +50,68 @@ class Move
     * @param \CodingBeard\Chess\Board\Move to
     */
     public function __construct(const <\CodingBeard\Chess\Board\Square> from = null, <\CodingBeard\Chess\Board\Square>
-     to = null)
+     to = null, const <\CodingBeard\Chess\Board\Move> doubleMove = null)
     {
         if from {
             let this->from = from;
-            if from->getPiece() {
-                if from->getPiece()->getType() == "Knight" {
-                    let this->noClip = true;
-                }
-            }
         }
         if to {
             let this->to = to;
-            if to->getPiece() && !this->noClip {
-                let this->obstacle = true;
+            if from->getPiece() && to->getPiece() {
+                if to->getPiece()->getColour() != from->getPiece()->getColour() {
+                    let this->attack = true;
+                }
             }
         }
-    }
-
-    /**
-    * @param \CodingBeard\Chess\Board\Move from
-    */
-    public function setFrom(const <\CodingBeard\Chess\Board\Square> from)
-    {
-        if from->getPiece() {
-            if from->getPiece()->getType() == "Knight" {
-                let this->noClip = true;
-            }
+        if doubleMove {
+            let this->doubleMove = doubleMove;
         }
-        let this->from = from;
-    }
 
-    /**
-    * @param \CodingBeard\Chess\Board\Move to
-    */
-    public function setTo(const <\CodingBeard\Chess\Board\Square> to)
-    {
-        if !this->obstacle {
-            if to->getPiece() && !this->noClip {
-                let this->obstacle = true;
+        if from {
+            if from->getPiece() {
+                if from->getY() == 0 || from->getY() == 7 {
+                    if from->getPiece()->getType() == "King" {
+                        if abs(from->getX() - to->getX()) == 2 {
+                            if to->getX() == 2 && to->getY() == 0 {
+                                let this->doubleMove = new self(
+                                    new Square(0, 0, new Rook(Piece::WHITE)), new Square(3, 0)
+                                );
+                            }
+                            elseif to->getX() == 6 && to->getY() == 0 {
+                                let this->doubleMove = new self(
+                                    new Square(7, 0, new Rook(Piece::WHITE)), new Square(5, 0)
+                                );
+                            }
+                            elseif to->getX() == 2 && to->getY() == 7 {
+                                let this->doubleMove = new self(
+                                    new Square(0, 7, new Rook(Piece::BLACK)), new Square(3, 7)
+                                );
+                            }
+                            elseif to->getX() == 6 && to->getY() == 7 {
+                                let this->doubleMove = new self(
+                                    new Square(7, 7, new Rook(Piece::BLACK)), new Square(5, 7)
+                                );
+                            }
+                        }
+                    }
+                }
+                elseif from->getY() == 3 || from->getY() == 4 {
+                    if from->getPiece()->getType() == "Pawn" && from->getX() != to->getX() && !to->getPiece() {
+                        if from->getPiece()->getColour() == Piece::WHITE {
+                            let this->doubleMove = new self(
+                                new Square(to->getX(), to->getY() - 1, new Pawn(Piece::BLACK)),
+                                new Square(to->getX(), to->getY())
+                            );
+                        }
+                        elseif from->getPiece()->getColour() == Piece::BLACK {
+                            let this->doubleMove = new self(
+                                new Square(to->getX(), to->getY() + 1, new Pawn(Piece::WHITE)),
+                                new Square(to->getX(), to->getY())
+                            );
+                        }
+                    }
+                }
             }
-            let this->to = to;
         }
     }
 

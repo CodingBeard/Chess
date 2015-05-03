@@ -154,12 +154,27 @@ class BoardTest extends PHPUnit_Framework_TestCase
     public function testMakeMove()
     {
         $board = new Board();
+        $board->setSquare(3, 0, new Queen(Piece::WHITE));
         $move = new Move(new Square(3, 0, new Queen(Piece::WHITE)), new Square(4, 4));
         $board->makeMove($move);
 
         $this->assertEquals(new Square(3, 0), $board->getSquare(3, 0));
         $this->assertEquals(new Square(4, 4, new Queen(Piece::WHITE)), $board->getSquare(4, 4));
+    }
 
+    /**
+     * @covers            \CodingBeard\Chess\Board::undoMove
+     * @uses              \CodingBeard\Chess\Board
+     */
+    public function testUndoMove()
+    {
+        $board = new Board();
+        $board->setSquare(4, 4, new Queen(Piece::WHITE));
+        $move = new Move(new Square(3, 0, new Queen(Piece::WHITE)), new Square(4, 4));
+        $board->undoMove($move);
+
+        $this->assertEquals(new Square(3, 0, new Queen(Piece::WHITE)), $board->getSquare(3, 0));
+        $this->assertEquals(new Square(4, 4), $board->getSquare(4, 4));
     }
 
     /**
@@ -169,8 +184,8 @@ class BoardTest extends PHPUnit_Framework_TestCase
     public function testPrintBoard()
     {
         $board = new Board();
-        $this->assertEquals(
-              "   | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |   " . PHP_EOL
+        $this->assertEquals(PHP_EOL
+            . "   | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |   " . PHP_EOL
             . "-----------------------------------------------" . PHP_EOL
             . "7  | bR | bK | bB | bQ | bK | bB | bK | bR |   7" . PHP_EOL
             . "-----------------------------------------------" . PHP_EOL
