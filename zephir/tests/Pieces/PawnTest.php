@@ -11,6 +11,7 @@
  */
 
 
+use CodingBeard\Chess\Board\Square;
 use CodingBeard\Chess\Piece;
 use CodingBeard\Chess\Pieces\Pawn;
 
@@ -60,7 +61,7 @@ class PawnTest extends PHPUnit_Framework_TestCase
         $Pawn = new Pawn(Piece::WHITE);
 
         $this->assertEquals([
-            [[0, 1]], [[0, 2]], [[1, 1]],
+            [[0, 1], [0, 2]], [[1, 1]],
         ], $Pawn->getPotentialMoves(0, 0));
 
         $this->assertEquals([], $Pawn->getPotentialMoves(0, 7));
@@ -68,12 +69,33 @@ class PawnTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([], $Pawn->getPotentialMoves(7, 7));
 
         $this->assertEquals([
-            [[7, 1]], [[7, 2]], [[6, 1]],
+            [[7, 1], [7, 2]], [[6, 1]],
         ], $Pawn->getPotentialMoves(7, 0));
 
         $this->assertEquals([
-            [[3, 5]], [[3, 6]], [[4, 5]], [[2, 5]],
+            [[3, 5], [3, 6]], [[4, 5]], [[2, 5]],
         ], $Pawn->getPotentialMoves(3, 4));
+    }
+
+    /**
+     * @covers            \CodingBeard\Chess\Piece::checkMove
+     * @uses              \CodingBeard\Chess\Piece
+     */
+    public function testCheckMove()
+    {
+        $whitePawn = new Pawn(Piece::WHITE);
+        $blackPawn = new Pawn(Piece::BLACK);
+
+        $from = new Square(3, 1, $whitePawn);
+        $emptyTo = new Square(3, 2);
+        $emptyToTwo = new Square(3, 3);
+        $blackTo = new Square(3, 2, $blackPawn);
+        $whiteTo = new Square(3, 2, $whitePawn);
+
+        $this->assertEquals([true, 'break' => false], $whitePawn->checkMove($from, $emptyTo));
+        $this->assertEquals([true, 'break' => false], $whitePawn->checkMove($from, $emptyToTwo));
+        $this->assertEquals([false, 'break' => true], $whitePawn->checkMove($from, $blackTo));
+        $this->assertEquals([false, 'break' => true], $whitePawn->checkMove($from, $whiteTo));
     }
 
 }

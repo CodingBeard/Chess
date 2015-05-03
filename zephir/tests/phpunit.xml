@@ -9,13 +9,13 @@
          syntaxCheck="false">
     <testsuites>
         <testsuite name="stable">
+            <file>Board/SquareTest.php</file>
             <file>Pieces/KingTest.php</file>
             <file>Pieces/QueenTest.php</file>
             <file>Pieces/BishopTest.php</file>
             <file>Pieces/KnightTest.php</file>
             <file>Pieces/RookTest.php</file>
             <file>Pieces/PawnTest.php</file>
-            <file>Board/SquareTest.php</file>
             <file>Board/MoveTest.php</file>
             <file>BoardTest.php</file>
             <file>Board/testGetMoves/KingTest.php</file>
@@ -23,6 +23,7 @@
             <file>Board/testGetMoves/BishopTest.php</file>
             <file>Board/testGetMoves/KnightTest.php</file>
             <file>Board/testGetMoves/RookTest.php</file>
+            <file>Board/testGetMoves/PawnTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>

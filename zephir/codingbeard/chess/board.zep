@@ -108,7 +108,7 @@ class Board
     */
     public function getMoves(const int x, const int y) -> bool|array
     {
-        var from, to, direction, location;
+        var from, to, direction, location, response;
         array moves;
 
         let from = this->getSquare(x, y);
@@ -121,23 +121,16 @@ class Board
                 for location in direction {
 
                     let to = this->getSquare(location[0], location[1]);
+                    let response = from->getPiece()->checkMove(from, to);
 
-                    if !to->getPiece() {
+                    if response[0] {
                         let moves[] = new Move(from, to);
                     }
-                    else {
-                        if from->getPiece()->getColour() != to->getPiece()->getColour() {
-                            let moves[] = new Move(from, to);
-                            break;
-                        }
-                        else {
-                            if from->getPiece()->specialMove(from, to) {
-                                let moves[] = new Move(from, to);
-                            }
-                            break;
-                        }
+                    if response["break"] {
+                        break;
                     }
                 }
+
             }
             return moves;
         }

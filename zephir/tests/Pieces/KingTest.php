@@ -11,6 +11,7 @@
  */
 
 
+use CodingBeard\Chess\Board\Square;
 use CodingBeard\Chess\Piece;
 use CodingBeard\Chess\Pieces\King;
 
@@ -67,5 +68,24 @@ class KingTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([
             [[3, 5]], [[4, 5]], [[4, 4]], [[4, 3]], [[3, 3]], [[2, 3]], [[2, 4]], [[2, 5]],
         ], $King->getPotentialMoves(3, 4));
+    }
+
+    /**
+     * @covers            \CodingBeard\Chess\Piece::checkAttack
+     * @uses              \CodingBeard\Chess\Piece
+     */
+    public function testCheckMove()
+    {
+        $whiteKing = new King(Piece::WHITE);
+        $blackKing = new King(Piece::BLACK);
+
+        $from = new Square(3, 0, $whiteKing);
+        $emptyTo = new Square(3, 1);
+        $blackTo = new Square(3, 1, $blackKing);
+        $whiteTo = new Square(3, 1, $whiteKing);
+
+        $this->assertEquals([true, 'break' => false], $whiteKing->checkMove($from, $emptyTo));
+        $this->assertEquals([true, 'break' => true], $whiteKing->checkMove($from, $blackTo));
+        $this->assertEquals([false, 'break' => true], $whiteKing->checkMove($from, $whiteTo));
     }
 }

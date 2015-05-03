@@ -73,15 +73,23 @@ abstract class Piece
         return array_values(moves);
     }
 
-
     /**
-    * Return all the squares this piece could potentially move to
+    * Check a move to see if we can do it
     * @param \CodingBeard\Chess\Board\Square from
     * @param \CodingBeard\Chess\Board\Square to
     */
-    public function specialMove(const <\CodingBeard\Chess\Board\Square> from, const <\CodingBeard\Chess\Board\Square> to) -> bool
+    public function checkMove(const <\CodingBeard\Chess\Board\Square> from, const <\CodingBeard\Chess\Board\Square> to)
+    -> array
     {
-        return false;
+        if to->getPiece() {
+            if from->getPiece()->getColour() != to->getPiece()->getColour() {
+                return [true, "break": true];
+            }
+            else {
+                return [false, "break": true];
+            }
+        }
+        return [true, "break": false];
     }
 
     /**
