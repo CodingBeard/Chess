@@ -56,7 +56,7 @@ class PawnTest extends PHPUnit_Framework_TestCase
      * @covers            \CodingBeard\Chess\Piece::GetPotentialMoves
      * @uses              \CodingBeard\Chess\Piece
      */
-    public function testGetPotentialMoves()
+    public function testGetPotentialMovesWhite()
     {
         $Pawn = new Pawn(Piece::WHITE);
 
@@ -74,6 +74,31 @@ class PawnTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals([
             [[3, 5], [3, 6]], [[4, 5]], [[2, 5]],
+        ], $Pawn->getPotentialMoves(3, 4));
+    }
+
+    /**
+     * @covers            \CodingBeard\Chess\Piece::GetPotentialMoves
+     * @uses              \CodingBeard\Chess\Piece
+     */
+    public function testGetPotentialMovesWhiteBlack()
+    {
+        $Pawn = new Pawn(Piece::BLACK);
+
+        $this->assertEquals([], $Pawn->getPotentialMoves(0, 0));
+
+        $this->assertEquals([
+            [[0, 6], [0, 5]], [[1, 6]],
+        ], $Pawn->getPotentialMoves(0, 7));
+
+        $this->assertEquals([
+            [[7, 6], [7, 5]], [[6, 6]],
+        ], $Pawn->getPotentialMoves(7, 7));
+
+        $this->assertEquals([], $Pawn->getPotentialMoves(7, 0));
+
+        $this->assertEquals([
+            [[3, 3], [3, 2]], [[4, 3]], [[2, 3]],
         ], $Pawn->getPotentialMoves(3, 4));
     }
 

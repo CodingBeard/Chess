@@ -178,6 +178,34 @@ class BoardTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers            \CodingBeard\Chess\Board::makeMove
+     * @covers            \CodingBeard\Chess\Board::undoMove
+     * @uses              \CodingBeard\Chess\Board
+     */
+    public function testHistory()
+    {
+        $board = new Board();
+        $board->setSquare(3, 0, new Queen(Piece::WHITE));
+        $firstMove = new Move(new Square(3, 0, new Queen(Piece::WHITE)), new Square(4, 4));
+        $board->makeMove($firstMove);
+
+        $this->assertEquals([$firstMove], $board->getHistory());
+
+        $secondMove = new Move(new Square(4, 4, new Queen(Piece::WHITE)), new Square(4, 5));
+        $board->makeMove($secondMove);
+
+        $this->assertEquals([$firstMove, $secondMove], $board->getHistory());
+
+        $board->undoMove($secondMove);
+
+        $this->assertEquals([$firstMove], $board->getHistory());
+
+        $board->undoMove($firstMove);
+
+        $this->assertEquals([], $board->getHistory());
+    }
+
+    /**
      * @covers            \CodingBeard\Chess\Board::printBoard
      * @uses              \CodingBeard\Chess\Board
      */

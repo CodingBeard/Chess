@@ -115,4 +115,64 @@ class PassantTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new Square(1, 4, new Pawn(Piece::WHITE)), $board->getSquare(1, 4));
         $this->assertEquals(new Square(2, 4, new Pawn(Piece::BLACK)), $board->getSquare(2, 4));
     }
+
+    /**
+     * @covers            \CodingBeard\Chess\Board::getMoves
+     * @covers            \CodingBeard\Chess\Board::checkForEnPassant
+     * @uses              \CodingBeard\Chess\Board
+     */
+    public function testGetMovesPassant()
+    {
+        $board = new Board(true);
+        $board->setSquare(0, 3, new Pawn(Piece::WHITE));
+        $board->setSquare(1, 3, new Pawn(Piece::BLACK));
+
+        $this->assertEquals([
+            new Move(new Square(1, 3, new Pawn(Piece::BLACK)), new Square(1, 2)),
+        ], $board->getMoves(1, 3));
+
+        $board->setHistory([new Move(new Square(0, 1, new Pawn(Piece::WHITE)), new Square(0, 3))]);
+
+        $this->assertEquals([
+            new Move(new Square(1, 3, new Pawn(Piece::BLACK)), new Square(1, 2)),
+            new Move(new Square(1, 3, new Pawn(Piece::BLACK)), new Square(0, 2)),
+        ], $board->getMoves(1, 3));
+
+
+        $board = new Board(true);
+        $board->setSquare(2, 3, new Pawn(Piece::WHITE));
+        $board->setSquare(1, 3, new Pawn(Piece::BLACK));
+
+        $board->setHistory([new Move(new Square(2, 1, new Pawn(Piece::WHITE)), new Square(2, 3))]);
+
+        $this->assertEquals([
+            new Move(new Square(1, 3, new Pawn(Piece::BLACK)), new Square(1, 2)),
+            new Move(new Square(1, 3, new Pawn(Piece::BLACK)), new Square(2, 2)),
+        ], $board->getMoves(1, 3));
+
+
+        $board = new Board(true);
+        $board->setSquare(0, 4, new Pawn(Piece::BLACK));
+        $board->setSquare(1, 4, new Pawn(Piece::WHITE));
+
+        $board->setHistory([new Move(new Square(0, 6, new Pawn(Piece::BLACK)), new Square(0, 4))]);
+
+        $this->assertEquals([
+            new Move(new Square(1, 4, new Pawn(Piece::WHITE)), new Square(1, 5)),
+            new Move(new Square(1, 4, new Pawn(Piece::WHITE)), new Square(0, 5)),
+        ], $board->getMoves(1, 4));
+
+
+        $board = new Board(true);
+        $board->setSquare(2, 4, new Pawn(Piece::BLACK));
+        $board->setSquare(1, 4, new Pawn(Piece::WHITE));
+
+        $board->setHistory([new Move(new Square(2, 6, new Pawn(Piece::BLACK)), new Square(2, 4))]);
+
+        $this->assertEquals([
+            new Move(new Square(1, 4, new Pawn(Piece::WHITE)), new Square(1, 5)),
+            new Move(new Square(1, 4, new Pawn(Piece::WHITE)), new Square(2, 5)),
+        ], $board->getMoves(1, 4));
+
+    }
 }

@@ -81,20 +81,21 @@ class GetMovesPawnTest extends PHPUnit_Framework_TestCase
     public function testGetMovesObstaclesBlack()
     {
         $board = new Board(true);
-        $board->setSquare(3, 1, new Pawn(Piece::BLACK));
-        $from = new Square(3, 1, new Pawn(Piece::BLACK));
+        $board->setSquare(3, 6, new Pawn(Piece::BLACK));
+        $from = new Square(3, 6, new Pawn(Piece::BLACK));
 
         /* white/black obstacles alternating and increasing/decreasing in distance */
-        $board->setSquare(3, 2, new Pawn(Piece::WHITE)); //N
-        $board->setSquare(4, 2, new Pawn(Piece::BLACK)); //NE
-        $board->setSquare(2, 2, new Pawn(Piece::WHITE)); //NW
+        $board->setSquare(3, 5, new Pawn(Piece::WHITE)); //S
+        $board->setSquare(4, 5, new Pawn(Piece::BLACK)); //SE
+        $board->setSquare(2, 5, new Pawn(Piece::WHITE)); //SW
+
         $this->assertEquals([
-            /* N */
-            /* NN */
-            /* NE */
-            /* NW */
-            new Move($from, new Square(2, 2, new Pawn(Piece::WHITE))),
-        ], $board->getMoves(3, 1));
+            /* S */
+            /* SS */
+            /* SE */
+            /* SW */
+            new Move($from, new Square(2, 5, new Pawn(Piece::WHITE))),
+        ], $board->getMoves(3, 6));
     }
 
 }
