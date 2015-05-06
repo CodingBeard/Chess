@@ -14,9 +14,9 @@
 use CodingBeard\Chess\Board;
 use CodingBeard\Chess\Board\Move;
 use CodingBeard\Chess\Board\Square;
-use CodingBeard\Chess\Piece;
-use CodingBeard\Chess\Pieces\Pawn;
-use CodingBeard\Chess\Pieces\Bishop;
+use CodingBeard\Chess\Board\Piece;
+use CodingBeard\Chess\Board\Piece\Pawn;
+use CodingBeard\Chess\Board\Piece\Bishop;
 
 class GetMovesBishopTest extends PHPUnit_Framework_TestCase
 {
@@ -27,7 +27,7 @@ class GetMovesBishopTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMovesNoObstacles()
     {
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(3, 4, new Bishop(Piece::WHITE));
         $from = new Square(3, 4, new Bishop(Piece::WHITE));
 
@@ -50,7 +50,7 @@ class GetMovesBishopTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMovesNoPiece()
     {
-        $board = new Board(true);
+        $board = new Board();
 
         $this->assertEquals(false, $board->getMoves(3, 4));
     }
@@ -61,7 +61,7 @@ class GetMovesBishopTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMovesObstaclesWhite()
     {
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(3, 4, new Bishop(Piece::WHITE));
         $from = new Square(3, 4, new Bishop(Piece::WHITE));
 
@@ -89,7 +89,7 @@ class GetMovesBishopTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMovesObstaclesBlack()
     {
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(3, 4, new Bishop(Piece::BLACK));
         $from = new Square(3, 4, new Bishop(Piece::BLACK));
 

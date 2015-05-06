@@ -14,13 +14,8 @@
 use CodingBeard\Chess\Board;
 use CodingBeard\Chess\Board\Square;
 use CodingBeard\Chess\Board\Move;
-use CodingBeard\Chess\Piece;
-use CodingBeard\Chess\Pieces\Bishop;
-use CodingBeard\Chess\Pieces\King;
-use CodingBeard\Chess\Pieces\Knight;
-use CodingBeard\Chess\Pieces\Pawn;
-use CodingBeard\Chess\Pieces\Queen;
-use CodingBeard\Chess\Pieces\Rook;
+use CodingBeard\Chess\Board\Piece;
+use CodingBeard\Chess\Board\Piece\Queen;
 
 class BoardTest extends PHPUnit_Framework_TestCase
 {
@@ -37,84 +32,84 @@ class BoardTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals([
             [
-                new Square(0, 0, new Rook(Piece::WHITE)),
-                new Square(0, 1, new Pawn(Piece::WHITE)),
+                new Square(0, 0),
+                new Square(0, 1),
                 new Square(0, 2),
                 new Square(0, 3),
                 new Square(0, 4),
                 new Square(0, 5),
-                new Square(0, 6, new Pawn(Piece::BLACK)),
-                new Square(0, 7, new Rook(Piece::BLACK)),
+                new Square(0, 6),
+                new Square(0, 7),
             ],
             [
-                new Square(1, 0, new Knight(Piece::WHITE)),
-                new Square(1, 1, new Pawn(Piece::WHITE)),
+                new Square(1, 0),
+                new Square(1, 1),
                 new Square(1, 2),
                 new Square(1, 3),
                 new Square(1, 4),
                 new Square(1, 5),
-                new Square(1, 6, new Pawn(Piece::BLACK)),
-                new Square(1, 7, new Knight(Piece::BLACK)),
+                new Square(1, 6),
+                new Square(1, 7),
             ],
             [
-                new Square(2, 0, new Bishop(Piece::WHITE)),
-                new Square(2, 1, new Pawn(Piece::WHITE)),
+                new Square(2, 0),
+                new Square(2, 1),
                 new Square(2, 2),
                 new Square(2, 3),
                 new Square(2, 4),
                 new Square(2, 5),
-                new Square(2, 6, new Pawn(Piece::BLACK)),
-                new Square(2, 7, new Bishop(Piece::BLACK)),
+                new Square(2, 6),
+                new Square(2, 7),
             ],
             [
-                new Square(3, 0, new Queen(Piece::WHITE)),
-                new Square(3, 1, new Pawn(Piece::WHITE)),
+                new Square(3, 0),
+                new Square(3, 1),
                 new Square(3, 2),
                 new Square(3, 3),
                 new Square(3, 4),
                 new Square(3, 5),
-                new Square(3, 6, new Pawn(Piece::BLACK)),
-                new Square(3, 7, new Queen(Piece::BLACK)),
+                new Square(3, 6),
+                new Square(3, 7),
             ],
             [
-                new Square(4, 0, new King(Piece::WHITE)),
-                new Square(4, 1, new Pawn(Piece::WHITE)),
+                new Square(4, 0),
+                new Square(4, 1),
                 new Square(4, 2),
                 new Square(4, 3),
                 new Square(4, 4),
                 new Square(4, 5),
-                new Square(4, 6, new Pawn(Piece::BLACK)),
-                new Square(4, 7, new King(Piece::BLACK)),
+                new Square(4, 6),
+                new Square(4, 7),
             ],
             [
-                new Square(5, 0, new Bishop(Piece::WHITE)),
-                new Square(5, 1, new Pawn(Piece::WHITE)),
+                new Square(5, 0),
+                new Square(5, 1),
                 new Square(5, 2),
                 new Square(5, 3),
                 new Square(5, 4),
                 new Square(5, 5),
-                new Square(5, 6, new Pawn(Piece::BLACK)),
-                new Square(5, 7, new Bishop(Piece::BLACK)),
+                new Square(5, 6),
+                new Square(5, 7),
             ],
             [
-                new Square(6, 0, new Knight(Piece::WHITE)),
-                new Square(6, 1, new Pawn(Piece::WHITE)),
+                new Square(6, 0),
+                new Square(6, 1),
                 new Square(6, 2),
                 new Square(6, 3),
                 new Square(6, 4),
                 new Square(6, 5),
-                new Square(6, 6, new Pawn(Piece::BLACK)),
-                new Square(6, 7, new Knight(Piece::BLACK)),
+                new Square(6, 6),
+                new Square(6, 7),
             ],
             [
-                new Square(7, 0, new Rook(Piece::WHITE)),
-                new Square(7, 1, new Pawn(Piece::WHITE)),
+                new Square(7, 0),
+                new Square(7, 1),
                 new Square(7, 2),
                 new Square(7, 3),
                 new Square(7, 4),
                 new Square(7, 5),
-                new Square(7, 6, new Pawn(Piece::BLACK)),
-                new Square(7, 7, new Rook(Piece::BLACK)),
+                new Square(7, 6),
+                new Square(7, 7),
             ],
         ], $board->getSquares());
     }
@@ -127,7 +122,6 @@ class BoardTest extends PHPUnit_Framework_TestCase
     {
         $board = new Board();
 
-        $this->assertEquals(new Square(0, 0, new Rook(Piece::WHITE)), $board->getSquare(0, 0));
         $this->assertEquals(new Square(2, 5), $board->getSquare(2, 5));
     }
 
@@ -154,10 +148,14 @@ class BoardTest extends PHPUnit_Framework_TestCase
     public function testMakeMove()
     {
         $board = new Board();
+
+        $this->assertEquals(Piece::WHITE, $board->getTurn());
+
         $board->setSquare(3, 0, new Queen(Piece::WHITE));
         $move = new Move(new Square(3, 0, new Queen(Piece::WHITE)), new Square(4, 4));
         $board->makeMove($move);
 
+        $this->assertEquals(Piece::BLACK, $board->getTurn());
         $this->assertEquals(new Square(3, 0), $board->getSquare(3, 0));
         $this->assertEquals(new Square(4, 4, new Queen(Piece::WHITE)), $board->getSquare(4, 4));
     }
@@ -169,10 +167,18 @@ class BoardTest extends PHPUnit_Framework_TestCase
     public function testUndoMove()
     {
         $board = new Board();
-        $board->setSquare(4, 4, new Queen(Piece::WHITE));
+
+        $this->assertEquals(Piece::WHITE, $board->getTurn());
+
+        $board->setSquare(3, 0, new Queen(Piece::WHITE));
         $move = new Move(new Square(3, 0, new Queen(Piece::WHITE)), new Square(4, 4));
+        $board->makeMove($move);
+
+        $this->assertEquals(Piece::BLACK, $board->getTurn());
+
         $board->undoMove($move);
 
+        $this->assertEquals(Piece::WHITE, $board->getTurn());
         $this->assertEquals(new Square(3, 0, new Queen(Piece::WHITE)), $board->getSquare(3, 0));
         $this->assertEquals(new Square(4, 4), $board->getSquare(4, 4));
     }
@@ -206,32 +212,20 @@ class BoardTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers            \CodingBeard\Chess\Board::printBoard
+     * @covers            \CodingBeard\Chess\Board::toString
      * @uses              \CodingBeard\Chess\Board
      */
     public function testPrintBoard()
     {
         $board = new Board();
-        $this->assertEquals(PHP_EOL
-            . "   | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |   " . PHP_EOL
-            . "-----------------------------------------------" . PHP_EOL
-            . "7  | bR | bK | bB | bQ | bK | bB | bK | bR |   7" . PHP_EOL
-            . "-----------------------------------------------" . PHP_EOL
-            . "6  | bP | bP | bP | bP | bP | bP | bP | bP |   6" . PHP_EOL
-            . "-----------------------------------------------" . PHP_EOL
-            . "5  |    |    |    |    |    |    |    |    |   5" . PHP_EOL
-            . "-----------------------------------------------" . PHP_EOL
-            . "4  |    |    |    |    |    |    |    |    |   4" . PHP_EOL
-            . "-----------------------------------------------" . PHP_EOL
-            . "3  |    |    |    |    |    |    |    |    |   3" . PHP_EOL
-            . "-----------------------------------------------" . PHP_EOL
-            . "2  |    |    |    |    |    |    |    |    |   2" . PHP_EOL
-            . "-----------------------------------------------" . PHP_EOL
-            . "1  | wP | wP | wP | wP | wP | wP | wP | wP |   1" . PHP_EOL
-            . "-----------------------------------------------" . PHP_EOL
-            . "0  | wR | wK | wB | wQ | wK | wB | wK | wR |   0" . PHP_EOL
-            . "-----------------------------------------------" . PHP_EOL
-            . "   | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |   " . PHP_EOL, $board->printBoard());
+        $board->setDefaults();
+        $this->assertEquals(
+            '[{"0":[0,"Rook"],"1":[0,"Pawn"],"6":[1,"Pawn"],"7":[1,"Rook"]},{"0":[0,"Knight"],'
+            . '"1":[0,"Pawn"],"6":[1,"Pawn"],"7":[1,"Knight"]},{"0":[0,"Bishop"],"1":[0,"Pawn"],"6":[1,"Pawn"],"7":[1,'
+            . '"Bishop"]},{"0":[0,"Queen"],"1":[0,"Pawn"],"6":[1,"Pawn"],"7":[1,"Queen"]},{"0":[0,"King"],"1":[0,"Pawn"],'
+            . '"6":[1,"Pawn"],"7":[1,"King"]},{"0":[0,"Bishop"],"1":[0,"Pawn"],"6":[1,"Pawn"],"7":[1,"Bishop"]},{"0":[0,'
+            . '"Knight"],"1":[0,"Pawn"],"6":[1,"Pawn"],"7":[1,"Knight"]},{"0":[0,"Rook"],"1":[0,"Pawn"],"6":[1,"Pawn"],'
+            . '"7":[1,"Rook"]}]', $board->toString());
     }
 
 }

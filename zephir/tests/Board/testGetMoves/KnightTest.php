@@ -14,9 +14,9 @@
 use CodingBeard\Chess\Board;
 use CodingBeard\Chess\Board\Move;
 use CodingBeard\Chess\Board\Square;
-use CodingBeard\Chess\Piece;
-use CodingBeard\Chess\Pieces\Knight;
-use CodingBeard\Chess\Pieces\Pawn;
+use CodingBeard\Chess\Board\Piece;
+use CodingBeard\Chess\Board\Piece\Knight;
+use CodingBeard\Chess\Board\Piece\Pawn;
 
 class GetMovesKnightTest extends PHPUnit_Framework_TestCase
 {
@@ -27,7 +27,7 @@ class GetMovesKnightTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMoves()
     {
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(3, 4, new Knight(Piece::WHITE));
         $from = new Square(3, 4, new Knight(Piece::WHITE));
 
@@ -49,7 +49,7 @@ class GetMovesKnightTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMovesNoPiece()
     {
-        $board = new Board(true);
+        $board = new Board();
 
         $this->assertEquals(false, $board->getMoves(3, 4));
     }
@@ -60,7 +60,7 @@ class GetMovesKnightTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMovesObstaclesWhite()
     {
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(3, 4, new Knight(Piece::WHITE));
         $from = new Square(3, 4, new Knight(Piece::WHITE));
 
@@ -99,7 +99,7 @@ class GetMovesKnightTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMovesObstaclesBlack()
     {
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(3, 4, new Knight(Piece::BLACK));
         $from = new Square(3, 4, new Knight(Piece::BLACK));
 

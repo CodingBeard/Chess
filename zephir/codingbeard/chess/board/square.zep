@@ -10,7 +10,7 @@
 
 namespace CodingBeard\Chess\Board;
 
-use CodingBeard\Chess\Piece;
+use CodingBeard\Chess\Board\Piece;
 
 class Square
 {
@@ -29,7 +29,7 @@ class Square
     };
 
     /**
-    * @var false|\CodingBeard\Chess\Piece
+    * @var false|\CodingBeard\Chess\Board\Piece
     */
     public piece = false {
         get, set
@@ -39,9 +39,9 @@ class Square
     * Constructor
     * @param int x
     * @param int y
-    * @param \CodingBeard\Chess\Piece piece
+    * @param \CodingBeard\Chess\Board\Piece piece
     */
-    public function __construct(const int x, const int y, const <\CodingBeard\Chess\Piece> piece = null)
+    public function __construct(const int x, const int y, const <\CodingBeard\Chess\Board\Piece> piece = null)
     {
         let this->x = x;
         let this->y = y;
@@ -96,7 +96,7 @@ class Square
                 throw new \Exception(parts[2][1] . " is not a valid piece type.");
             }
 
-            let name = "\\CodingBeard\\Chess\\Pieces\\" . parts[2][1], colour = parts[2][0];
+            let name = "\\CodingBeard\\Chess\\Board\\Piece\\" . parts[2][1], colour = parts[2][0];
 
             return new self(parts[0], parts[1], new {name}(colour));
         }

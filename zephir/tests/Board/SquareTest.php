@@ -12,8 +12,8 @@
 
 
 use CodingBeard\Chess\Board\Square;
-use CodingBeard\Chess\Piece;
-use CodingBeard\Chess\Pieces\Pawn;
+use CodingBeard\Chess\Board\Piece;
+use CodingBeard\Chess\Board\Piece\Pawn;
 
 class SquareTest extends PHPUnit_Framework_TestCase
 {
@@ -28,7 +28,7 @@ class SquareTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('CodingBeard\Chess\Board\Square', $Square);
         $this->assertEquals(0, $Square->getX());
         $this->assertEquals(1, $Square->getY());
-        $this->assertInstanceOf('CodingBeard\Chess\Pieces\Pawn', $Square->getPiece());
+        $this->assertInstanceOf('CodingBeard\Chess\Board\Piece\Pawn', $Square->getPiece());
 
         $Square = new Square(0, 1);
         $this->assertEquals(false, $Square->getPiece());

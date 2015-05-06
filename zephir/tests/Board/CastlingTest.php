@@ -14,9 +14,9 @@
 use CodingBeard\Chess\Board;
 use CodingBeard\Chess\Board\Square;
 use CodingBeard\Chess\Board\Move;
-use CodingBeard\Chess\Piece;
-use CodingBeard\Chess\Pieces\King;
-use CodingBeard\Chess\Pieces\Rook;
+use CodingBeard\Chess\Board\Piece;
+use CodingBeard\Chess\Board\Piece\King;
+use CodingBeard\Chess\Board\Piece\Rook;
 
 class CastlingTest extends PHPUnit_Framework_TestCase
 {
@@ -27,7 +27,7 @@ class CastlingTest extends PHPUnit_Framework_TestCase
      */
     public function testMakeMoveCastling()
     {
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(0, 0, new Rook(Piece::WHITE));
         $board->setSquare(4, 0, new King(Piece::WHITE));
         $move = new Move(new Square(4, 0, new King(Piece::WHITE)), new Square(2, 0));
@@ -39,7 +39,7 @@ class CastlingTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new Square(2, 0, new King(Piece::WHITE)), $board->getSquare(2, 0));
 
 
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(7, 0, new Rook(Piece::WHITE));
         $board->setSquare(4, 0, new King(Piece::WHITE));
         $move = new Move(new Square(4, 0, new King(Piece::WHITE)), new Square(6, 0));
@@ -51,7 +51,7 @@ class CastlingTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new Square(6, 0, new King(Piece::WHITE)), $board->getSquare(6, 0));
 
 
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(0, 7, new Rook(Piece::BLACK));
         $board->setSquare(4, 7, new King(Piece::BLACK));
         $move = new Move(new Square(4, 7, new King(Piece::BLACK)), new Square(2, 7));
@@ -63,7 +63,7 @@ class CastlingTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new Square(2, 7, new King(Piece::BLACK)), $board->getSquare(2, 7));
 
 
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(7, 7, new Rook(Piece::BLACK));
         $board->setSquare(4, 7, new King(Piece::BLACK));
         $move = new Move(new Square(4, 7, new King(Piece::BLACK)), new Square(6, 7));
@@ -81,7 +81,7 @@ class CastlingTest extends PHPUnit_Framework_TestCase
      */
     public function testUndoMoveCastling()
     {
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(3, 0, new Rook(Piece::WHITE));
         $board->setSquare(2, 0, new King(Piece::WHITE));
         $move = new Move(new Square(4, 0, new King(Piece::WHITE)), new Square(2, 0));
@@ -93,7 +93,7 @@ class CastlingTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new Square(4, 0, new King(Piece::WHITE)), $board->getSquare(4, 0));
 
 
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(5, 0, new Rook(Piece::WHITE));
         $board->setSquare(6, 0, new King(Piece::WHITE));
         $move = new Move(new Square(4, 0, new King(Piece::WHITE)), new Square(6, 0));
@@ -105,7 +105,7 @@ class CastlingTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new Square(4, 0, new King(Piece::WHITE)), $board->getSquare(4, 0));
 
 
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(3, 7, new Rook(Piece::BLACK));
         $board->setSquare(2, 7, new King(Piece::BLACK));
         $move = new Move(new Square(4, 7, new King(Piece::BLACK)), new Square(2, 7));
@@ -117,7 +117,7 @@ class CastlingTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new Square(4, 7, new King(Piece::BLACK)), $board->getSquare(4, 7));
 
 
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(5, 7, new Rook(Piece::BLACK));
         $board->setSquare(6, 7, new King(Piece::BLACK));
         $move = new Move(new Square(4, 7, new King(Piece::BLACK)), new Square(6, 7));
@@ -136,7 +136,7 @@ class CastlingTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMovesCastling()
     {
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(0, 0, new Rook(Piece::WHITE));
         $board->setSquare(7, 0, new Rook(Piece::WHITE));
         $board->setSquare(4, 0, new King(Piece::WHITE));
@@ -168,7 +168,7 @@ class CastlingTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($whiteNormalMoves, $board->getMoves(4, 0));
 
 
-        $board = new Board(true);
+        $board = new Board();
         $board->setSquare(0, 7, new Rook(Piece::BLACK));
         $board->setSquare(7, 7, new Rook(Piece::BLACK));
         $board->setSquare(4, 7, new King(Piece::BLACK));

@@ -10,8 +10,9 @@
 
 namespace CodingBeard\Chess;
 
-use CodingBeard\Chess\Board\Square;
 use CodingBeard\Chess\Board\Move;
+use CodingBeard\Chess\Board\Piece;
+use CodingBeard\Chess\Board\Square;
 
 class Board
 {
@@ -46,25 +47,42 @@ class Board
     };
 
     /**
-    * Constructor
-    * @param bool blank whether to generate a blank board or not
+    * @var int
     */
-    public function __construct(const bool blank = false)
+    public turn {
+        get, set
+    };
+
+    /**
+    * Constructor
+    * @param int turn
+    */
+    public function __construct(const int turn = 0)
     {
         int x = 0, y = 0;
 
         while x < 8 {
             let y = 0;
             while y < 8 {
-                if isset this->defaults[x][y] && !blank {
-                    let this->squares[x][y] = new Square(x, y, Piece::fromString(this->defaults[x][y]));
-                }
-                else {
-                    let this->squares[x][y] = new Square(x, y);
-                }
+                let this->squares[x][y] = new Square(x, y);
                 let y++;
             }
             let x++;
+        }
+        let this->turn = turn;
+    }
+
+    /**
+    * Set the board up with default pieces
+    */
+    public function setDefaults()
+    {
+        var x, y, column, pieceString;
+
+        for x, column in this->defaults {
+            for y, pieceString in column {
+                this->setSquare(x, y, Piece::fromString(pieceString));
+            }
         }
     }
 
@@ -85,7 +103,7 @@ class Board
     * Set a square at a location
     * @param int x
     * @param int y
-    * @param \CodingBeard\Chess\Piece piece
+    * @param \CodingBeard\Chess\Board\Piece piece
     */
     public function setSquare(const int x, const int y, const var piece = false) -> <\CodingBeard\Chess\Board>
     {
@@ -252,6 +270,13 @@ class Board
         this->setSquare(move->getTo()->getX(), move->getTo()->getY(), move->getFrom()->getPiece());
         this->setSquare(move->getFrom()->getX(), move->getFrom()->getY(), false);
 
+        if move->getFrom()->getPiece()->getColour() == Piece::WHITE {
+            let this->turn = Piece::BLACK;
+        }
+        else {
+            let this->turn = Piece::WHITE;
+        }
+
         let this->history[] = move;
     }
 
@@ -269,33 +294,29 @@ class Board
         if move->getDoubleMove() {
             this->undoMove(move->getDoubleMove());
         }
+
+        if move->getFrom()->getPiece()->getColour() == Piece::WHITE {
+            let this->turn = Piece::WHITE;
+        }
+        else {
+            let this->turn = Piece::BLACK;
+        }
     }
 
     /**
-    * Print out the board in human readable format
+    * Stringify self
     */
-    public function printBoard() -> string
+    public function toString() -> string
     {
-        string board = "";
-        int x = 0, y = 7;
-
-        let board .=  PHP_EOL . "   | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |   " . PHP_EOL;
-
-        while y > -1 {
-            let x = 0;
-            let board .= "-----------------------------------------------" . PHP_EOL;
-            let board .= strval(y) . "  | ";
-            while x < 8 {
-                let board .= this->getSquare(x, y)->toString(true) . " | ";
-                let x++;
+        var column, square, squares = [];
+        for column in this->squares {
+            for square in column {
+                if square->getPiece() {
+                    let squares[square->getX()][square->getY()] = [square->getPiece()->getColour(), square->getPiece()->getType()];
+                }
             }
-            let board .= "  " . strval(y) . PHP_EOL;
-            let y--;
         }
-
-        let board .= "-----------------------------------------------" . PHP_EOL;
-        let board .= "   | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |   " . PHP_EOL;
-        return board;
+        return json_encode(squares);
     }
 
 }

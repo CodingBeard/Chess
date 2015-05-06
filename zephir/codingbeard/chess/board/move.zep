@@ -10,9 +10,9 @@
 
 namespace CodingBeard\Chess\Board;
 
-use CodingBeard\Chess\Piece;
-use CodingBeard\Chess\Pieces\Rook;
-use CodingBeard\Chess\Pieces\Pawn;
+use CodingBeard\Chess\Board\Piece;
+use CodingBeard\Chess\Board\Piece\Rook;
+use CodingBeard\Chess\Board\Piece\Pawn;
 
 class Move
 {

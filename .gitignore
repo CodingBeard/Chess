@@ -31,3 +31,25 @@ zephir/**/ext/.deps
 zephir/**/ext/libtool
 
 .idea/
+logs/
+!logs/.gitignore
+PhalconStubs/
+
+*.sql
+!app/config/initialize.sql
+.sass-cache
+vendor
+app/cache/
+!app/cache/.gitignore
+app/config/config.php
+app/modules/frontend/views/content/*.volt
+app/modules/backend/views/content/*.volt
+app/modules/backend/controllers/TestController.php
+app/modules/backend/views/test
+public/css/admin.min.css
+public/css/main.min.css
+public/js/admin.min.js
+public/js/main.min.js
+cli/test.php
+cli/pids/*.pid
+cli/cache/*.php

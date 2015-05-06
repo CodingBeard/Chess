@@ -13,11 +13,11 @@
 
 use CodingBeard\Chess\Board\Move;
 use CodingBeard\Chess\Board\Square;
-use CodingBeard\Chess\Piece;
-use CodingBeard\Chess\Pieces\King;
-use CodingBeard\Chess\Pieces\Knight;
-use CodingBeard\Chess\Pieces\Pawn;
-use CodingBeard\Chess\Pieces\Rook;
+use CodingBeard\Chess\Board\Piece;
+use CodingBeard\Chess\Board\Piece\King;
+use CodingBeard\Chess\Board\Piece\Knight;
+use CodingBeard\Chess\Board\Piece\Pawn;
+use CodingBeard\Chess\Board\Piece\Rook;
 
 class MoveTest extends PHPUnit_Framework_TestCase
 {
