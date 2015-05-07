@@ -28,7 +28,7 @@
   <script src="js/tweenjs-0.6.0.min.js"></script>
   <script type="text/javascript">
     $(function () {
-      var canvas, stage, update = true, loadedImages = [], square, scale, dragging = false,
+      var canvas, stage, update = true, loadedImages = [], square, scale, dragging = false, tween = false,
           move = {from: {x: 0, y: 0}, to: {x: 0, y: 0}};
       var squares = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}};
 
@@ -41,6 +41,7 @@
         drawBoard();
 
         stage.enableMouseOver(10);
+        stage.mouseMoveOutside = true;
       }
 
       function drawBoard() {
@@ -83,7 +84,7 @@
         window.onresize = function () {
           onResize();
         };
-
+        createjs.Ticker.setFPS(20);
         createjs.Ticker.addEventListener("tick", tick);
       }
 
@@ -109,7 +110,7 @@
               }
               else {
                 image = makeBitmap("/img/chess/pieces/black/" + pieces[x - 1][y - 1][1] + ".png");
-                image.shadow = new createjs.Shadow("#000", 1, 1, 5);
+                image.shadow = new createjs.Shadow("#000", 1, 1, 2);
               }
               piece.addChild(image);
               square.addChild(piece);
@@ -143,17 +144,89 @@
               });
 
               piece.on("pressmove", function (evt) {
-                this.x = (evt.stageX / scale) + this.offset.x;
-                this.y = (evt.stageY / scale) + this.offset.y;
+                var x = Math.floor(((evt.stageX / scale)) / 200);
+                var y = Math.floor((2000 - ((evt.stageY / scale))) / 200);
+
+                if (0 < x && x < 9 && 0 < y && y < 9) {
+                  move.to = {x: x, y: y};
+                  this.x = (evt.stageX / scale) + this.offset.x;
+                  this.y = (evt.stageY / scale) + this.offset.y;
+                }
+                else {
+                  if (1 > x) {
+                    if (1 > y) {
+                      move.to = {x: 1, y: 1};
+                      this.x = 200 + this.offset.x;
+                      this.y = 1800 + this.offset.y;
+                    }
+                    else if (8 < y) {
+                      move.to = {x: 1, y: 8};
+                      this.x = 200 + this.offset.x;
+                      this.y = 200 + this.offset.y;
+                    }
+                    else {
+                      move.to = {x: 1, y: y};
+                      this.x = 200 + this.offset.x;
+                      this.y = (evt.stageY / scale) + this.offset.y;
+                    }
+                  }
+                  else if (8 < x) {
+                    if (1 > y) {
+                      move.to = {x: 8, y: 1};
+                      this.x = 1800 + this.offset.x;
+                      this.y = 1800 + this.offset.y;
+                    }
+                    else if (8 < y) {
+                      move.to = {x: 8, y: 8};
+                      this.x = 1800 + this.offset.x;
+                      this.y = 200 + this.offset.y;
+                    }
+                    else {
+                      move.to = {x: 8, y: y};
+                      this.x = 1800 + this.offset.x;
+                      this.y = (evt.stageY / scale) + this.offset.y;
+                    }
+                  }
+                  else if (1 > y) {
+                    if (1 > x) {
+                      move.to = {x: 1, y: 1};
+                      this.x = 200 + this.offset.x;
+                      this.y = 1800 + this.offset.y;
+                    }
+                    else if (8 < x) {
+                      move.to = {x: 8, y: 1};
+                      this.x = 1800 + this.offset.x;
+                      this.y = 200 + this.offset.y;
+                    }
+                    else {
+                      move.to = {x: x, y: 1};
+                      this.x = (evt.stageX / scale) + this.offset.x;
+                      this.y = 1800 + this.offset.y;
+                    }
+                  }
+                  else if (8 < y) {
+                    if (1 > x) {
+                      move.to = {x: 1, y: 8};
+                      this.x = 200 + this.offset.x;
+                      this.y = 1800 + this.offset.y;
+                    }
+                    else if (8 < x) {
+                      move.to = {x: 8, y: 8};
+                      this.x = 1800 + this.offset.x;
+                      this.y = 1800 + this.offset.y;
+                    }
+                    else {
+                      move.to = {x: x, y: 8};
+                      this.x = (evt.stageX / scale) + this.offset.x;
+                      this.y = 200 + this.offset.y;
+                    }
+                  }
+                }
                 update = true;
                 dragging = true;
               });
 
               piece.on("pressup", function (evt) {
-                move.to = {
-                  x: Math.floor(((evt.stageX / scale)) / 200),
-                  y: Math.floor((2000 - ((evt.stageY / scale))) / 200)
-                };
                 this.x = move.to.x * 200;
                 this.y = (9 - move.to.y) * 200;
                 this.location = move.to;
@@ -170,10 +243,23 @@
       }
 
       function tick(event) {
-        if (update) {
+        if (update || tween) {
           update = false;
           stage.update(event);
         }
+      }
+
+      function tweenToSquare(piece, x, y, time) {
+        if (!time) {
+          time = 1000;
+        }
+        tween = true;
+        createjs.Tween.get(piece, {loop: false}).to({
+          x: x * 200,
+          y: (9 - y) * 200
+        }, time).wait(100).call(function () {
+          tween = false;
+        });
       }
 
       function makeBitmap(url) {
