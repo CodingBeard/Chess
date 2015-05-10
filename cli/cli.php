@@ -15,6 +15,7 @@ use CodingBeard\Emails\SiteEmails;
 use Phalcon\Cli\Console;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Di\FactoryDefault\Cli;
+use Phalcon\Http\Response\Cookies;
 use Phalcon\Mvc\View;
 use Phalcon\Mvc\View\Engine\Volt;
 use Tartan\Mandrill;
@@ -23,6 +24,7 @@ try {
     $config = include __DIR__ . "/../app/config/config.php";
 
     $dirs = $config->loader->dirs->toArray();
+    $dirs[] = __DIR__;
     $dirs[] = __DIR__ . '/tasks/';
 
     $loader = new \Phalcon\Loader();

@@ -23,9 +23,6 @@ class IndexController extends ControllerBase
     public function indexAction()
     {
         $this->tag->appendTitle("Home");
-        $board = new Board();
-        $board->setDefaults();
-        $this->view->board = $board;
     }
 
 }

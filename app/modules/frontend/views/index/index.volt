@@ -1,4 +1,4 @@
-{# 
+{#
 @package: BeardSite
 @author: Tim Marshall <Tim@CodingBeard.com>
 @copyright: (c) 2015, Tim Marshall
@@ -20,6 +20,7 @@
     <canvas id="canvas">
 
     </canvas>
+    <a id="new-game" href="#" class="btn">New Game</a>
   </div>
 {% endblock %}
 
@@ -29,7 +30,7 @@
   <script type="text/javascript">
     $(function () {
       var canvas, stage, update = true, loadedImages = [], square, scale, dragging = false, tween = false,
-          move = {from: {x: 0, y: 0}, to: {x: 0, y: 0}};
+          move = {from: {x: 0, y: 0}, to: {x: 0, y: 0}}, pieces;
       var squares = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}};
 
       init();
@@ -48,6 +49,8 @@
         var icon;
 
         stage.addChild(makeBitmap("/img/chess/board.jpg"));
+        pieces = new createjs.Container();
+        stage.addChild(pieces);
 
         for (var i = 1; i < 9; i += 1) {
           icon = makeBitmap("/img/chess/letters/" + i + ".png");
@@ -77,8 +80,6 @@
           stage.addChild(icon);
         }
 
-        addPieces({{ board.toString() }});
-
         stage.update();
 
         window.onresize = function () {
@@ -88,151 +89,16 @@
         createjs.Ticker.addEventListener("tick", tick);
       }
 
-      function addPieces(pieces) {
+      function addPieces(locations) {
+        pieces.removeAllChildren();
         for (var x = 1; x < 9; x += 1) {
           for (var y = 1; y < 9; y += 1) {
             square = new createjs.Container();
             squares[x][y] = square;
-            stage.addChild(square);
+            pieces.addChild(square);
 
-            if (pieces[x - 1][y - 1]) {
-              var piece = new createjs.Container();
-              piece.location = {x: x, y: 9 - y};
-              piece.x = x * 200;
-              piece.y = y * 200;
-              var rectangle = new createjs.Graphics().beginFill("#fff").drawRect(0, 0, 200, 200);
-              piece.addChild(new createjs.Shape()).set({graphics: rectangle, alpha: 0.01});
-
-              var image;
-              if (pieces[x - 1][y - 1][0] == 0) {
-                image = makeBitmap("/img/chess/pieces/white/" + pieces[x - 1][y - 1][1] + ".png");
-                image.shadow = new createjs.Shadow("#000", 1, 1, 20);
-              }
-              else {
-                image = makeBitmap("/img/chess/pieces/black/" + pieces[x - 1][y - 1][1] + ".png");
-                image.shadow = new createjs.Shadow("#000", 1, 1, 2);
-              }
-              piece.addChild(image);
-              square.addChild(piece);
-
-
-              piece.on("rollover", function (evt) {
-                var image = this.getChildAt(1);
-                if (image) {
-                  this.cursor = "pointer";
-                  image.x = image.x - 20;
-                  image.y = image.y - 20;
-                  image.scaleX = image.scaleY = 1.2;
-                  update = true;
-                }
-              });
-
-              piece.on("rollout", function (evt) {
-                var image = this.getChildAt(1);
-                if (image) {
-                  this.cursor = "";
-                  image.x = image.x + 20;
-                  image.y = image.y + 20;
-                  image.scaleX = image.scaleY = 1;
-                  update = true;
-                }
-              });
-
-              piece.on("mousedown", function (evt) {
-                this.offset = {x: this.x - (evt.stageX / scale), y: this.y - (evt.stageY / scale)};
-                move.from = this.location;
-              });
-
-              piece.on("pressmove", function (evt) {
-                var x = Math.floor(((evt.stageX / scale)) / 200);
-                var y = Math.floor((2000 - ((evt.stageY / scale))) / 200);
-
-                if (0 < x && x < 9 && 0 < y && y < 9) {
-                  move.to = {x: x, y: y};
-                  this.x = (evt.stageX / scale) + this.offset.x;
-                  this.y = (evt.stageY / scale) + this.offset.y;
-                }
-                else {
-                  if (1 > x) {
-                    if (1 > y) {
-                      move.to = {x: 1, y: 1};
-                      this.x = 200 + this.offset.x;
-                      this.y = 1800 + this.offset.y;
-                    }
-                    else if (8 < y) {
-                      move.to = {x: 1, y: 8};
-                      this.x = 200 + this.offset.x;
-                      this.y = 200 + this.offset.y;
-                    }
-                    else {
-                      move.to = {x: 1, y: y};
-                      this.x = 200 + this.offset.x;
-                      this.y = (evt.stageY / scale) + this.offset.y;
-                    }
-                  }
-                  else if (8 < x) {
-                    if (1 > y) {
-                      move.to = {x: 8, y: 1};
-                      this.x = 1800 + this.offset.x;
-                      this.y = 1800 + this.offset.y;
-                    }
-                    else if (8 < y) {
-                      move.to = {x: 8, y: 8};
-                      this.x = 1800 + this.offset.x;
-                      this.y = 200 + this.offset.y;
-                    }
-                    else {
-                      move.to = {x: 8, y: y};
-                      this.x = 1800 + this.offset.x;
-                      this.y = (evt.stageY / scale) + this.offset.y;
-                    }
-                  }
-                  else if (1 > y) {
-                    if (1 > x) {
-                      move.to = {x: 1, y: 1};
-                      this.x = 200 + this.offset.x;
-                      this.y = 1800 + this.offset.y;
-                    }
-                    else if (8 < x) {
-                      move.to = {x: 8, y: 1};
-                      this.x = 1800 + this.offset.x;
-                      this.y = 200 + this.offset.y;
-                    }
-                    else {
-                      move.to = {x: x, y: 1};
-                      this.x = (evt.stageX / scale) + this.offset.x;
-                      this.y = 1800 + this.offset.y;
-                    }
-                  }
-                  else if (8 < y) {
-                    if (1 > x) {
-                      move.to = {x: 1, y: 8};
-                      this.x = 200 + this.offset.x;
-                      this.y = 1800 + this.offset.y;
-                    }
-                    else if (8 < x) {
-                      move.to = {x: 8, y: 8};
-                      this.x = 1800 + this.offset.x;
-                      this.y = 1800 + this.offset.y;
-                    }
-                    else {
-                      move.to = {x: x, y: 8};
-                      this.x = (evt.stageX / scale) + this.offset.x;
-                      this.y = 200 + this.offset.y;
-                    }
-                  }
-                }
-                update = true;
-                dragging = true;
-              });
-
-              piece.on("pressup", function (evt) {
-                this.x = move.to.x * 200;
-                this.y = (9 - move.to.y) * 200;
-                this.location = move.to;
-                update = true;
-                dragging = false;
-              });
+            if (locations[x - 1][y - 1]) {
+              addPiece(locations[x - 1][y - 1], x, y);
             }
             else {
               squares[x][y].removeChildAt(0);
@@ -240,6 +106,146 @@
             }
           }
         }
+      }
+
+      function addPiece(definition, x, y) {
+        var piece = new createjs.Container();
+        piece.location = {x: x, y: 9 - y};
+        piece.x = x * 200;
+        piece.y = y * 200;
+        var rectangle = new createjs.Graphics().beginFill("#fff").drawRect(0, 0, 200, 200);
+        piece.addChild(new createjs.Shape()).set({graphics: rectangle, alpha: 0.01});
+
+        var image;
+        if (definition[0] == 0) {
+          image = makeBitmap("/img/chess/pieces/white/" + definition[1] + ".png");
+          image.shadow = new createjs.Shadow("#000", 1, 1, 20);
+        }
+        else {
+          image = makeBitmap("/img/chess/pieces/black/" + definition[1] + ".png");
+          image.shadow = new createjs.Shadow("#000", 1, 1, 2);
+        }
+        piece.addChild(image);
+        square.addChild(piece);
+
+
+        piece.on("rollover", function (evt) {
+          var image = this.getChildAt(1);
+          if (image) {
+            this.cursor = "pointer";
+            image.x = image.x - 20;
+            image.y = image.y - 20;
+            image.scaleX = image.scaleY = 1.2;
+            update = true;
+          }
+        });
+
+        piece.on("rollout", function (evt) {
+          var image = this.getChildAt(1);
+          if (image) {
+            this.cursor = "";
+            image.x = image.x + 20;
+            image.y = image.y + 20;
+            image.scaleX = image.scaleY = 1;
+            update = true;
+          }
+        });
+
+        piece.on("mousedown", function (evt) {
+          this.offset = {x: this.x - (evt.stageX / scale), y: this.y - (evt.stageY / scale)};
+          move.from = this.location;
+        });
+
+        piece.on("pressmove", function (evt) {
+          var x = Math.floor(((evt.stageX / scale)) / 200);
+          var y = Math.floor((2000 - ((evt.stageY / scale))) / 200);
+
+          if (0 < x && x < 9 && 0 < y && y < 9) {
+            move.to = {x: x, y: y};
+            this.x = (evt.stageX / scale) + this.offset.x;
+            this.y = (evt.stageY / scale) + this.offset.y;
+          }
+          else {
+            if (1 > x) {
+              if (1 > y) {
+                move.to = {x: 1, y: 1};
+                this.x = 200 + this.offset.x;
+                this.y = 1800 + this.offset.y;
+              }
+              else if (8 < y) {
+                move.to = {x: 1, y: 8};
+                this.x = 200 + this.offset.x;
+                this.y = 200 + this.offset.y;
+              }
+              else {
+                move.to = {x: 1, y: y};
+                this.x = 200 + this.offset.x;
+                this.y = (evt.stageY / scale) + this.offset.y;
+              }
+            }
+            else if (8 < x) {
+              if (1 > y) {
+                move.to = {x: 8, y: 1};
+                this.x = 1800 + this.offset.x;
+                this.y = 1800 + this.offset.y;
+              }
+              else if (8 < y) {
+                move.to = {x: 8, y: 8};
+                this.x = 1800 + this.offset.x;
+                this.y = 200 + this.offset.y;
+              }
+              else {
+                move.to = {x: 8, y: y};
+                this.x = 1800 + this.offset.x;
+                this.y = (evt.stageY / scale) + this.offset.y;
+              }
+            }
+            else if (1 > y) {
+              if (1 > x) {
+                move.to = {x: 1, y: 1};
+                this.x = 200 + this.offset.x;
+                this.y = 1800 + this.offset.y;
+              }
+              else if (8 < x) {
+                move.to = {x: 8, y: 1};
+                this.x = 1800 + this.offset.x;
+                this.y = 200 + this.offset.y;
+              }
+              else {
+                move.to = {x: x, y: 1};
+                this.x = (evt.stageX / scale) + this.offset.x;
+                this.y = 1800 + this.offset.y;
+              }
+            }
+            else if (8 < y) {
+              if (1 > x) {
+                move.to = {x: 1, y: 8};
+                this.x = 200 + this.offset.x;
+                this.y = 1800 + this.offset.y;
+              }
+              else if (8 < x) {
+                move.to = {x: 8, y: 8};
+                this.x = 1800 + this.offset.x;
+                this.y = 1800 + this.offset.y;
+              }
+              else {
+                move.to = {x: x, y: 8};
+                this.x = (evt.stageX / scale) + this.offset.x;
+                this.y = 200 + this.offset.y;
+              }
+            }
+          }
+          update = true;
+          dragging = true;
+        });
+
+        piece.on("pressup", function (evt) {
+          this.x = move.to.x * 200;
+          this.y = (9 - move.to.y) * 200;
+          this.location = move.to;
+          update = true;
+          dragging = false;
+        });
       }
 
       function tick(event) {
@@ -291,6 +297,45 @@
 
         stage.update()
       }
+
+      var playerId = '{{ auth.token }}';
+      var socket = new WebSocket('ws://chess.local.com:8080');
+      socket.onopen = onOpen;
+      socket.onclose = onClose;
+      socket.onmessage = onMessage;
+
+      function onOpen(e) {
+        socket.send(JSON.stringify({action: "connect", params: {playerId: playerId}}));
+      }
+
+      function onMessage(e) {
+        var response = JSON.parse(e.data);
+        if (response.type == "alert") {
+          switch (response.params.type) {
+            case "log":
+              console.log(response.params.body);
+              break;
+            case "alert":
+              alert(response.params.body);
+              break;
+          }
+
+        }
+      }
+
+      function onClose(e) {
+        console.log("Connection lost.. Trying to reconnect.");
+        setTimeout(function () {
+          socket = new WebSocket('ws://chess.local.com:8080');
+          socket.onopen = onOpen;
+          socket.onclose = onClose;
+          socket.onmessage = onMessage;
+        }, 2000);
+      }
+
+      $('#new-game').click(function () {
+        socket.send('{"type": "hi"}');
+      })
     });
   </script>
 {% endblock %}
