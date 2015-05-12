@@ -1,6 +1,7 @@
 <?php
 namespace CodingBeard\Chess;
 
+use models\Players;
 use Phalcon\Mvc\User\Component;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
@@ -40,8 +41,8 @@ class Websocket extends Component implements MessageComponentInterface
     {
         $json = json_decode($msg);
         if ($json) {
-            if (!isset($client->playerId) && $json->action != 'connect') {
-                $client->send(json_encode(['type' => 'alert', 'params' => [
+            if (!isset($client->player) && $json->action != 'connect') {
+                return $client->send(json_encode(['type' => 'alert', 'params' => [
                     'type' => 'error',
                     'body' => 'You must first auth before using any other functions.'
                 ]]));
@@ -58,8 +59,13 @@ class Websocket extends Component implements MessageComponentInterface
      */
     public function onClose(ConnectionInterface $client)
     {
-        unset($this->clients[$client->playerId]);
-        echo "Player ({$client->playerId}) has disconnected\n";
+        if (isset($client->player)) {
+            unset($this->clients[$client->player->id]);
+            echo "Player ({$client->player->id}) has disconnected\n";
+        }
+        else {
+            echo "An unauthenticated client has disconnected\n";
+        }
     }
 
     /**
@@ -81,9 +87,14 @@ class Websocket extends Component implements MessageComponentInterface
      */
     public function connect(ConnectionInterface $client, $params)
     {
-        $client->playerId = $params->playerId;
-        $this->clients[$params->playerId] = $client;
-        echo "Player ({$client->playerId}) has connected\n";
+        $player = new Players();
+        $player->token = $params->token;
+        $player->save();
+
+        $client->player = $player;
+
+        $this->clients[$player->id] = $client;
+        echo "Player ({$player->id}) has connected\n";
         return json_encode(['type' => 'alert', 'params' => [
             'type' => 'log',
             'body' => 'Connected.'

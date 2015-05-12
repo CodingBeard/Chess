@@ -298,14 +298,14 @@
         stage.update()
       }
 
-      var playerId = '{{ auth.token }}';
+      var playerToken = '{{ auth.token }}';
       var socket = new WebSocket('ws://chess.local.com:8080');
       socket.onopen = onOpen;
       socket.onclose = onClose;
       socket.onmessage = onMessage;
 
       function onOpen(e) {
-        socket.send(JSON.stringify({action: "connect", params: {playerId: playerId}}));
+        socket.send(JSON.stringify({action: "connect", params: {token: playerToken}}));
       }
 
       function onMessage(e) {
@@ -334,7 +334,7 @@
       }
 
       $('#new-game').click(function () {
-        socket.send('{"type": "hi"}');
+        socket.send(JSON.stringify({action: "connect", params: {token: playerToken}}));
       })
     });
   </script>
