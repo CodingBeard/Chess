@@ -1,6 +1,8 @@
 <?php
 namespace CodingBeard\Chess;
 
+use CodingBeard\Chess\Board\Piece;
+use models\Games;
 use models\Players;
 use Phalcon\Mvc\User\Component;
 use Ratchet\MessageComponentInterface;
@@ -18,10 +20,16 @@ use Ratchet\ConnectionInterface;
 class Websocket extends Component implements MessageComponentInterface
 {
     /**
-     * Array of clients, keys are their player IDs
+     * Array of clients, keys are their players model IDs
      * @var array
      */
     public $clients = [];
+
+    /**
+     * Array of games, keys are their games model IDs
+     * @var array
+     */
+    public $games = [];
 
     /**
      * When a client Connects
@@ -42,10 +50,12 @@ class Websocket extends Component implements MessageComponentInterface
         $json = json_decode($msg);
         if ($json) {
             if (!isset($client->player) && $json->action != 'connect') {
-                return $client->send(json_encode(['type' => 'alert', 'params' => [
-                    'type' => 'error',
-                    'body' => 'You must first auth before using any other functions.'
-                ]]));
+                return $client->send(json_encode([
+                    ['type' => 'alert', 'params' => [
+                        'type' => 'error',
+                        'body' => 'You must first auth before using any other functions.'
+                    ]]
+                ]));
             }
             if (method_exists($this, $json->action)) {
                 $client->send($this->{$json->action}($client, $json->params));
@@ -87,17 +97,73 @@ class Websocket extends Component implements MessageComponentInterface
      */
     public function connect(ConnectionInterface $client, $params)
     {
-        $player = new Players();
-        $player->token = $params->token;
-        $player->save();
+        $player = Players::findFirstByToken($params->token);
+        if (!$player) {
+            $player = new Players();
+            $player->token = $params->token;
+            $player->save();
+        }
 
         $client->player = $player;
 
         $this->clients[$player->id] = $client;
         echo "Player ({$player->id}) has connected\n";
-        return json_encode(['type' => 'alert', 'params' => [
-            'type' => 'log',
-            'body' => 'Connected.'
-        ]]);
+        return json_encode([
+            ['type' => 'alert', 'params' => [
+                'type' => 'log',
+                'body' => 'Connected.'
+            ]]
+        ]);
+    }
+
+    /**
+     * Start a new game type
+     * @param ConnectionInterface $client
+     * @param $params
+     * @return string
+     */
+    public function newGame(ConnectionInterface $client, $params)
+    {
+        switch ($params->type) {
+            case "multiLocal":
+                return $this->newMutiLocal($client, $params);
+            case "aiLocal":
+
+
+        }
+    }
+
+    /**
+     * Start a new Multiplayer local game
+     * @param ConnectionInterface $client
+     * @param $params
+     * @return string
+     */
+    public function newMutiLocal(ConnectionInterface $client, $params)
+    {
+        $gameModel = new Games();
+        $gameModel->type = "multiLocal";
+        $gameModel->turn = Piece::WHITE;
+        $gameModel->playerW_id = $client->player->id;
+        $gameModel->playerB_id = $client->player->id;
+        $gameModel->save();
+
+        $board = new Board();
+        $board->setDefaults();
+        $game = new Game($board);
+
+        $gameModel->game = $game;
+
+        $this->games[$gameModel->id] = $gameModel;
+
+        return json_encode([
+            ['type' => 'alert', 'params' => [
+                'type' => 'alert',
+                'body' => 'New game started, White to go first.'
+            ]],
+            ['type' => 'addPieces', 'params' => [
+                'pieces' => $board->toArray()
+            ]]
+        ]);
     }
 }

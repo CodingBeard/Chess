@@ -18,11 +18,18 @@ class Players extends \Phalcon\Mvc\Model
     public $token;
 
     /**
+     *
+     * @var string
+     */
+    public $name;
+
+    /**
      * Initialize method for model.
      */
     public function initialize()
     {
-
+        $this->hasMany('id', 'models\Game', 'playerB_id', ['alias' => 'Game']);
+        $this->hasMany('id', 'models\Game', 'playerW_id', ['alias' => 'Game']);
     }
 
     public function getSource()
@@ -37,7 +44,8 @@ class Players extends \Phalcon\Mvc\Model
     {
         return array(
             'id' => 'id', 
-            'token' => 'token'
+            'token' => 'token', 
+            'name' => 'name'
         );
     }
 

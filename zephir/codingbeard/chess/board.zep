@@ -319,4 +319,20 @@ class Board
         return json_encode(squares);
     }
 
+    /**
+    * Array self
+    */
+    public function toArray() -> string
+    {
+        var column, square, squares = [];
+        for column in this->squares {
+            for square in column {
+                if square->getPiece() {
+                    let squares[square->getX()][square->getY()] = [square->getPiece()->getColour(), square->getPiece()->getType()];
+                }
+            }
+        }
+        return squares;
+    }
+
 }
