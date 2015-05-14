@@ -3,6 +3,7 @@ CodingBeard.Chess = CodingBeard.Chess || {};
 
 
 CodingBeard.Chess.Board = function (canvasId) {
+  var Board = this;
   this.canvas = document.getElementById(canvasId);
   this.stage = new createjs.Stage(this.canvas);
   this.pieces = new createjs.Container();
@@ -130,6 +131,7 @@ Board.prototype.makePiece = function (definition, x, y) {
   piece.on("rollover", function (evt) {
     var image = this.getChildAt(1);
     if (image) {
+      console.log('rollover');
       piece.cursor = "pointer";
       image.x = image.x - 20;
       image.y = image.y - 20;
@@ -141,6 +143,7 @@ Board.prototype.makePiece = function (definition, x, y) {
   piece.on("rollout", function (evt) {
     var image = this.getChildAt(1);
     if (image) {
+      console.log('rollout');
       piece.cursor = "";
       image.x = image.x + 20;
       image.y = image.y + 20;
