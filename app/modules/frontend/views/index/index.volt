@@ -82,6 +82,9 @@
       $('#new-game').click(function () {
         socket.send(JSON.stringify({action: "newGame", params: {type: "multiLocal"}}));
       });
+      $('#make-move').click(function () {
+        board.makeMove({from: {x: 1, y: 1, piece: board.getSquare(1, 1)}, to: {x: 5, y: 5}}, true);
+      });
 
     });
   </script>

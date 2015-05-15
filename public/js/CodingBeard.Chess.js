@@ -1,3 +1,6 @@
+var update = false, tween = false, dragging = false;
+var move = {from: {x: 0, y: 0, piece: false}, to: {x: 0, y: 0, piece: false}};
+
 var CodingBeard = CodingBeard || {};
 CodingBeard.Chess = CodingBeard.Chess || {};
 
@@ -16,22 +19,23 @@ CodingBeard.Chess.Board = function (canvasId) {
   this.stage.enableMouseOver(10);
   this.stage.mouseMoveOutside = true;
   createjs.Ticker.setFPS(20);
-  createjs.Ticker.addEventListener("tick", this.tick);
+  createjs.Ticker.addEventListener("tick", $.proxy(function (event) {
+    if (update || tween) {
+      update = false;
+      this.stage.update(event);
+    }
+  }, this));
 };
 
 var Board = CodingBeard.Chess.Board;
 
 Board.prototype.canvas = false;
 Board.prototype.stage = false;
-Board.prototype.update = false;
 Board.prototype.pieces = false;
-Board.prototype.dragging = false;
-Board.prototype.tween = false;
 Board.prototype.loadedImages = [];
 Board.prototype.squares = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}};
 Board.prototype.history = [];
 Board.prototype.turn = 0;
-Board.prototype.move = {from: {x: 0, y: 0, piece: false}, to: {x: 0, y: 0, piece: false}};
 
 Board.prototype.drawBoard = function () {
   var Board = this;
@@ -104,7 +108,7 @@ Board.prototype.addPieces = function (locations) {
       }
     }
   }
-  this.update = true;
+  update = true;
 };
 
 Board.prototype.makePiece = function (definition, x, y) {
@@ -131,30 +135,29 @@ Board.prototype.makePiece = function (definition, x, y) {
   piece.on("rollover", function (evt) {
     var image = this.getChildAt(1);
     if (image) {
-      console.log('rollover');
       piece.cursor = "pointer";
       image.x = image.x - 20;
       image.y = image.y - 20;
       image.scaleX = image.scaleY = 1.2;
-      Board.update = true;
+      update = true;
     }
   });
 
   piece.on("rollout", function (evt) {
     var image = this.getChildAt(1);
     if (image) {
-      console.log('rollout');
       piece.cursor = "";
       image.x = image.x + 20;
       image.y = image.y + 20;
       image.scaleX = image.scaleY = 1;
-      Board.update = true;
+      update = true;
     }
   });
 
   piece.on("mousedown", function (evt) {
     piece.offset = {x: piece.x - (evt.stageX / scale), y: piece.y - (evt.stageY / scale)};
-    Board.move.from = {x: piece.location.x, y: piece.location.y, piece: piece};
+    move.from = {x: piece.location.x, y: piece.location.y, piece: piece};
+    move.to = {x: piece.location.x, y: piece.location.y, piece: piece};
   });
 
   piece.on("pressmove", function (evt) {
@@ -162,91 +165,93 @@ Board.prototype.makePiece = function (definition, x, y) {
     var y = Math.floor((2000 - ((evt.stageY / scale))) / 200);
 
     if (0 < x && x < 9 && 0 < y && y < 9) {
-      Board.move.to = {x: x, y: y, piece: Board.getSquare(x, y)};
+      move.to = {x: x, y: y, piece: Board.getSquare(x, y)};
       piece.x = (evt.stageX / scale) + piece.offset.x;
       piece.y = (evt.stageY / scale) + piece.offset.y;
     }
     else {
       if (1 > x) {
         if (1 > y) {
-          Board.move.to = {x: 1, y: 1, piece: Board.getSquare(1, 1)};
+          move.to = {x: 1, y: 1, piece: Board.getSquare(1, 1)};
           piece.x = 200 + piece.offset.x;
           piece.y = 1800 + piece.offset.y;
         }
         else if (8 < y) {
-          Board.move.to = {x: 1, y: 8, piece: Board.getSquare(1, 8)};
+          move.to = {x: 1, y: 8, piece: Board.getSquare(1, 8)};
           piece.x = 200 + piece.offset.x;
           piece.y = 200 + piece.offset.y;
         }
         else {
-          Board.move.to = {x: 1, y: y, piece: Board.getSquare(1, y)};
+          move.to = {x: 1, y: y, piece: Board.getSquare(1, y)};
           piece.x = 200 + piece.offset.x;
           piece.y = (evt.stageY / scale) + piece.offset.y;
         }
       }
       else if (8 < x) {
         if (1 > y) {
-          Board.move.to = {x: 8, y: 1, piece: Board.getSquare(8, 1)};
+          move.to = {x: 8, y: 1, piece: Board.getSquare(8, 1)};
           piece.x = 1800 + piece.offset.x;
           piece.y = 1800 + piece.offset.y;
         }
         else if (8 < y) {
-          Board.move.to = {x: 8, y: 8, piece: Board.getSquare(8, 8)};
+          move.to = {x: 8, y: 8, piece: Board.getSquare(8, 8)};
           piece.x = 1800 + piece.offset.x;
           piece.y = 200 + piece.offset.y;
         }
         else {
-          Board.move.to = {x: 8, y: y, piece: Board.getSquare(8, y)};
+          move.to = {x: 8, y: y, piece: Board.getSquare(8, y)};
           piece.x = 1800 + piece.offset.x;
           piece.y = (evt.stageY / scale) + piece.offset.y;
         }
       }
       else if (1 > y) {
         if (1 > x) {
-          Board.move.to = {x: 1, y: 1, piece: Board.getSquare(1, 1)};
+          move.to = {x: 1, y: 1, piece: Board.getSquare(1, 1)};
           piece.x = 200 + piece.offset.x;
           piece.y = 1800 + piece.offset.y;
         }
         else if (8 < x) {
-          Board.move.to = {x: 8, y: 1, piece: Board.getSquare(8, 1)};
+          move.to = {x: 8, y: 1, piece: Board.getSquare(8, 1)};
           piece.x = 1800 + piece.offset.x;
           piece.y = 200 + piece.offset.y;
         }
         else {
-          Board.move.to = {x: x, y: 1, piece: Board.getSquare(x, 1)};
+          move.to = {x: x, y: 1, piece: Board.getSquare(x, 1)};
           piece.x = (evt.stageX / scale) + piece.offset.x;
           piece.y = 1800 + piece.offset.y;
         }
       }
       else if (8 < y) {
         if (1 > x) {
-          Board.move.to = {x: 1, y: 8, piece: Board.getSquare(1, 8)};
+          move.to = {x: 1, y: 8, piece: Board.getSquare(1, 8)};
           piece.x = 200 + piece.offset.x;
           piece.y = 1800 + piece.offset.y;
         }
         else if (8 < x) {
-          Board.move.to = {x: 8, y: 8, piece: Board.getSquare(8, 8)};
+          move.to = {x: 8, y: 8, piece: Board.getSquare(8, 8)};
           piece.x = 1800 + piece.offset.x;
           piece.y = 1800 + piece.offset.y;
         }
         else {
-          Board.move.to = {x: x, y: 8, piece: Board.getSquare(x, 8)};
+          move.to = {x: x, y: 8, piece: Board.getSquare(x, 8)};
           piece.x = (evt.stageX / scale) + piece.offset.x;
           piece.y = 200 + piece.offset.y;
         }
       }
     }
-    Board.update = true;
-    Board.dragging = true;
+    update = true;
+    dragging = true;
   });
 
   piece.on("pressup", function (evt) {
-    piece.x = Board.move.to.x * 200;
-    piece.y = (9 - Board.move.to.y) * 200;
-    piece.location = {x: Board.move.to.x, y: Board.move.to.y};
-    Board.makeMove(Board.move, true);
-    Board.update = true;
-    Board.dragging = false;
+    piece.x = move.to.x * 200;
+    piece.y = (9 - move.to.y) * 200;
+    if (piece.location.x != move.to.x || piece.location.y != move.to.y) {
+      piece.location = {x: move.to.x, y: move.to.y};
+      Board.makeMove(move);
+    }
+    update = true;
+    dragging = false;
   });
 
   return piece;
@@ -254,6 +259,7 @@ Board.prototype.makePiece = function (definition, x, y) {
 
 Board.prototype.makeMove = function (move, tween) {
   var Board = this;
+  console.log(move.from.x, move.from.y, "->", move.to.x, move.to.y);
   if (move.from.piece) {
     move.from.piece.location = {x: move.to.x, y: move.to.y};
     if (tween) {
@@ -285,12 +291,12 @@ Board.prototype.tweenToSquare = function (x, y, piece, time) {
   if (!time) {
     time = 1000;
   }
-  this.tween = true;
+  tween = true;
   return createjs.Tween.get(piece, {loop: false}).to({
     x: x * 200,
     y: (9 - y) * 200
   }, time).wait(100).call(function () {
-    Board.tween = false;
+    tween = false;
   });
 };
 
@@ -301,19 +307,11 @@ Board.prototype.makeBitmap = function (url) {
 
   if (this.loadedImages.indexOf(url) == -1) {
     image.onload = function () {
-      Board.stage.update();
+      update = true;
     };
     this.loadedImages.push(url);
   }
   return new createjs.Bitmap(image);
-};
-
-Board.prototype.tick = function (event) {
-  var Board = this;
-  if (this.update || this.tween) {
-    this.update = false;
-    this.stage.update(event);
-  }
 };
 
 Board.prototype.onResize = function () {
