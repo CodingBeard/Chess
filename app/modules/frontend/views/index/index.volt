@@ -29,11 +29,13 @@
 {% block javascripts %}
   <script src="js/easeljs-0.8.0.min.js"></script>
   <script src="js/tweenjs-0.6.0.min.js"></script>
-  <script src="js/CodingBeard.Chess.js"></script>
+  <script src="js/CodingBeard/Chess/Canvas.js"></script>
+  <script src="js/CodingBeard/Chess/Board.js"></script>
   <script type="text/javascript">
     $(function () {
 
-      var board = new CodingBeard.Chess.Board("canvas");
+      var canvas = new CodingBeard.Chess.Canvas("canvas");
+      var board = new CodingBeard.Chess.Board(canvas);
 
       board.drawBoard();
 
@@ -45,6 +47,16 @@
 
       function onOpen(e) {
         socket.send(JSON.stringify({action: "connect", params: {token: playerToken}}));
+      }
+
+      function onClose(e) {
+        console.log("Connection lost.. Trying to reconnect.");
+        setTimeout(function () {
+          socket = new WebSocket('ws://chess.local.com:8080');
+          socket.onopen = onOpen;
+          socket.onclose = onClose;
+          socket.onmessage = onMessage;
+        }, 2000);
       }
 
       function onMessage(e) {
@@ -67,16 +79,6 @@
             board.addPieces(response.params.pieces);
           }
         });
-      }
-
-      function onClose(e) {
-        console.log("Connection lost.. Trying to reconnect.");
-        setTimeout(function () {
-          socket = new WebSocket('ws://chess.local.com:8080');
-          socket.onopen = onOpen;
-          socket.onclose = onClose;
-          socket.onmessage = onMessage;
-        }, 2000);
       }
 
       $('#new-game').click(function () {
