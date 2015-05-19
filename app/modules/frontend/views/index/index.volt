@@ -20,9 +20,21 @@
     <canvas id="canvas">
 
     </canvas>
+
+    <div id="alert-modal" class="modal">
+      <div class="modal-content">
+        <h4 class="modal-header center"></h4>
+
+        <p class="modal-message"></p>
+      </div>
+      <div class="modal-footer">
+        <span class="modal-links">
+
+        </span>
+      </div>
+    </div>
+
     <a id="new-game" href="#" class="btn">New Game</a>
-    <a id="make-move" href="#" class="btn">Make Move</a>
-    <a id="undo-move" href="#" class="btn">Undo Move</a>
   </div>
 {% endblock %}
 
@@ -33,29 +45,31 @@
   <script src="js/CodingBeard/Chess/Board.js"></script>
   <script type="text/javascript">
     $(function () {
+      var socket;
+
+      connect();
+
+      function connect() {
+        socket = new WebSocket('ws://chess.local.com:8080');
+        socket.onopen = onOpen;
+        socket.onclose = onClose;
+        socket.onmessage = onMessage;
+      }
 
       var canvas = new CodingBeard.Chess.Canvas("canvas");
       var board = new CodingBeard.Chess.Board(canvas);
 
       board.drawBoard();
 
-      var playerToken = '{{ auth.token }}';
-      var socket = new WebSocket('ws://chess.local.com:8080');
-      socket.onopen = onOpen;
-      socket.onclose = onClose;
-      socket.onmessage = onMessage;
-
       function onOpen(e) {
-        socket.send(JSON.stringify({action: "connect", params: {token: playerToken}}));
+        board.socket = socket;
+        socket.send(JSON.stringify({action: "connect", params: {token: "{{ auth.token }}"}}));
       }
 
       function onClose(e) {
-        console.log("Connection lost.. Trying to reconnect.");
+        board.alert({type: "toast", message: "Connection lost, trying to reconnect.."});
         setTimeout(function () {
-          socket = new WebSocket('ws://chess.local.com:8080');
-          socket.onopen = onOpen;
-          socket.onclose = onClose;
-          socket.onmessage = onMessage;
+          connect();
         }, 2000);
       }
 
@@ -63,29 +77,23 @@
         var responses = JSON.parse(e.data);
         $.each(responses, function (k, response) {
           if (response.type == "alert") {
-            switch (response.params.type) {
-              case "log":
-                console.log(response.params.body);
-                break;
-              case "alert":
-                alert(response.params.body);
-                break;
-            }
+            board.alert(response.params);
+          }
+          else if (response.type == "setGame") {
+            board.gameId = response.params.id;
+            board.turn = response.params.turn;
           }
           else if (response.type == "addPieces") {
             board.addPieces(response.params.pieces);
           }
-          else if (response.type == "movePiece") {
-            board.addPieces(response.params.pieces);
+          else if (response.type == "invalidMove") {
+            board.invalidMove();
           }
         });
       }
 
       $('#new-game').click(function () {
-        socket.send(JSON.stringify({action: "newGame", params: {type: "multiLocal"}}));
-      });
-      $('#make-move').click(function () {
-        board.makeMove({from: {x: 1, y: 1, piece: board.getSquare(1, 1)}, to: {x: 5, y: 5}}, true);
+        board.send({action: "newGame", params: {type: "multiLocal"}});
       });
 
     });

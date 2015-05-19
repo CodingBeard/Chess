@@ -52,8 +52,8 @@ class Websocket extends Component implements MessageComponentInterface
             if (!isset($client->player) && $json->action != 'connect') {
                 return $client->send(json_encode([
                     ['type' => 'alert', 'params' => [
-                        'type' => 'error',
-                        'body' => 'You must first auth before using any other functions.'
+                        'type' => 'modal',
+                        'You must first auth before using any other functions'
                     ]]
                 ]));
             }
@@ -110,8 +110,8 @@ class Websocket extends Component implements MessageComponentInterface
         echo "Player ({$player->id}) has connected\n";
         return json_encode([
             ['type' => 'alert', 'params' => [
-                'type' => 'log',
-                'body' => 'Connected.'
+                'type' => 'toast',
+                'message' => 'Connected'
             ]]
         ]);
     }
@@ -128,7 +128,6 @@ class Websocket extends Component implements MessageComponentInterface
             case "multiLocal":
                 return $this->newMutiLocal($client, $params);
             case "aiLocal":
-
 
         }
     }
@@ -158,11 +157,70 @@ class Websocket extends Component implements MessageComponentInterface
 
         return json_encode([
             ['type' => 'alert', 'params' => [
-                'type' => 'alert',
-                'body' => 'New game started, White to go first.'
+                'type' => 'toast',
+                'message' => 'New game started, white to go first',
             ]],
             ['type' => 'addPieces', 'params' => [
                 'pieces' => $board->toArray()
+            ]],
+            ['type' => 'setGame', 'params' => [
+                'id' => $gameModel->id,
+                'turn' => $gameModel->turn
+            ]]
+        ]);
+    }
+
+    /**
+     * Check if a move is legal, if not send an invalid notice and move the piece back
+     * @param ConnectionInterface $client
+     * @param $params
+     * @return string
+     */
+    public function checkMove(ConnectionInterface $client, $params)
+    {
+        /** @var Games $gameModel */
+        $gameModel = $this->games[$params->gameId];
+        if (!$gameModel) {
+            $gameModel = Games::findFirstById($params->gameId);
+        }
+        if (!$gameModel) {
+            return json_encode([
+                ['type' => 'alert', 'params' => [
+                    'type' => 'modal',
+                    'message' => 'You do not have a game to check a move for.' . $params->get,
+                ]]
+            ]);
+        }
+
+        /** @var \CodingBeard\Chess\Game $game */
+        $game = $gameModel->game;
+
+        if ($game->getTurn() != $params->move->from->piece[0]) {
+            return json_encode([
+                ['type' => 'alert', 'params' => [
+                    'type' => 'toast',
+                    'message' => 'Invalid move',
+                ]],
+                ['type' => 'invalidMove'],
+            ]);
+        }
+
+
+        if ($game->getTurn() == Piece::WHITE) {
+            $game->setTurn(Piece::BLACK);
+        }
+        else {
+            $game->setTurn(Piece::WHITE);
+        }
+        $gameModel->save();
+        return json_encode([
+            ['type' => 'alert', 'params' => [
+                'type' => 'toast',
+                'message' => 'Valid move',
+            ]],
+            ['type' => 'setGame', 'params' => [
+                'id' => $gameModel->id,
+                'turn' => $game->getTurn()
             ]]
         ]);
     }

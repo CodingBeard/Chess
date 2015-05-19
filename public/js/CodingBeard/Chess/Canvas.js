@@ -18,6 +18,7 @@ CodingBeard.Chess = CodingBeard.Chess || {};
 CodingBeard.Chess.Canvas = function (canvasId) {
   this.canvas = document.getElementById(canvasId);
   this.stage = new createjs.Stage(this.canvas);
+  this.alert = new createjs.Container();
   this.pieces = new createjs.Container();
 
   this.onResize();
@@ -36,127 +37,136 @@ CodingBeard.Chess.Canvas = function (canvasId) {
   }, this));
 };
 
-/**
- * Element of our canvas
- * @type Element
- */
-CodingBeard.Chess.Canvas.prototype.canvas = false;
+CodingBeard.Chess.Canvas.prototype = {
+  /**
+   * Element of our canvas
+   * @type Element
+   */
+  canvas: false,
 
-/**
- * Our main stage
- * @type createjs.Stage
- */
-CodingBeard.Chess.Canvas.prototype.stage = false;
+  /**
+   * Our main stage
+   * @type createjs.Stage
+   */
+  stage: false,
 
-/**
- * Container for all of the pieces
- * @type createjs.Container
- */
-CodingBeard.Chess.Canvas.prototype.pieces = false;
+  /**
+   * Container for our alerts
+   * @type createjs.Container
+   */
+  alert: false,
 
-/**
- * Whether to update the stage on the next tick
- * @type bool
- */
-CodingBeard.Chess.Canvas.prototype.update = false;
+  /**
+   * Container for all of the pieces
+   * @type createjs.Container
+   */
+  pieces: false,
 
-/**
- * Whether we're currently tweening a piece
- * @type bool
- */
-CodingBeard.Chess.Canvas.prototype.tween = false;
+  /**
+   * Whether to update the stage on the next tick
+   * @type bool
+   */
+  update: false,
 
-/**
- * Urls of all the images we've loaded in the dom
- * @type Array
- */
-CodingBeard.Chess.Canvas.prototype.loadedImages = [];
+  /**
+   * Whether we're currently tweening a piece
+   * @type bool
+   */
+  tween: false,
+
+  /**
+   * Urls of all the images we've loaded in the dom
+   * @type Array
+   */
+  loadedImages: [],
 
 
-/**
- * Make the stage responsive
- */
-CodingBeard.Chess.Canvas.prototype.onResize = function () {
-  var w = window.innerWidth;
-  var h = window.innerHeight - 120;
+  /**
+   * Make the stage responsive
+   */
+  onResize: function () {
+    var w = window.innerWidth;
+    var h = window.innerHeight - 120;
 
-  var ow = 2000;
-  var oh = 2000;
+    var ow = 2000;
+    var oh = 2000;
 
-  scale = Math.min(w / ow, h / oh);
-  this.stage.scaleX = scale;
-  this.stage.scaleY = scale;
+    scale = Math.min(w / ow, h / oh);
+    this.stage.scaleX = scale;
+    this.stage.scaleY = scale;
 
-  this.stage.canvas.width = ow * scale;
-  this.stage.canvas.height = oh * scale;
+    this.stage.canvas.width = ow * scale;
+    this.stage.canvas.height = oh * scale;
 
-  this.stage.update();
-};
+    this.stage.update();
+  },
 
-/**
- * Tween a container to a xy location (pixels)
- * @param x int
- * @param y int
- * @param piece createjs.Container
- * @param time int
- */
-CodingBeard.Chess.Canvas.prototype.tweenToLocation = function (x, y, piece, time) {
-  if (!time) {
-    time = 1000;
-  }
-  this.tween = true;
-  return createjs.Tween.get(piece, {loop: false}).to({
-    x: x,
-    y: y
-  }, time).wait(100).call($.proxy(function () {
-    this.tween = false;
-  }, this));
-};
-
-/**
- * Create a bitmap object, and update the stage once the image has been loaded
- * @param url
- * @returns createjs.Bitmap
- */
-CodingBeard.Chess.Canvas.prototype.makeBitmap = function (url) {
-  image = new Image();
-  image.src = url;
-
-  if (this.loadedImages.indexOf(url) == -1) {
-    image.onload = $.proxy(function () {
-      this.update = true;
-    }, this);
-    this.loadedImages.push(url);
-  }
-  return new createjs.Bitmap(image);
-};
-
-/**
- * Make an image inside a container 'pop' when hovered over
- * getImage should return the image from the container
- * @param piece createjs.Container
- * @param getImage Closure
- */
-CodingBeard.Chess.Canvas.prototype.popOnHover = function (piece, getImage) {
-  piece.on("rollover", $.proxy(function (evt) {
-    var image = getImage(piece);
-    if (image) {
-      piece.cursor = "pointer";
-      image.x = image.x - 20;
-      image.y = image.y - 20;
-      image.scaleX = image.scaleY = 1.2;
-      this.update = true;
+  /**
+   * Tween a container to a xy location (pixels)
+   * @param x int
+   * @param y int
+   * @param piece createjs.Container
+   * @param time int
+   */
+  tweenToLocation: function (x, y, piece, time) {
+    if (!time) {
+      time = 1000;
     }
-  }, this));
+    this.tween = true;
+    return createjs.Tween.get(piece, {loop: false}).to({
+      x: x,
+      y: y
+    }, time).wait(100).call($.proxy(function () {
+      this.tween = false;
+    }, this));
+  },
 
-  piece.on("rollout", $.proxy(function (evt) {
-    var image = getImage(piece);
-    if (image) {
-      piece.cursor = "";
-      image.x = image.x + 20;
-      image.y = image.y + 20;
-      image.scaleX = image.scaleY = 1;
-      this.update = true;
+  /**
+   * Create a bitmap object, and update the stage once the image has been loaded
+   * @param url
+   * @returns createjs.Bitmap
+   */
+  makeBitmap: function (url) {
+    image = new Image();
+    image.src = url;
+
+    if (this.loadedImages.indexOf(url) == -1) {
+      image.onload = $.proxy(function () {
+        this.update = true;
+      }, this);
+      this.loadedImages.push(url);
     }
-  }, this));
+    return new createjs.Bitmap(image);
+  },
+
+  /**
+   * Make an image inside a container 'pop' when hovered over
+   * getImage should return the image from the container
+   * @param piece createjs.Container
+   * @param getImage Closure
+   */
+  popOnHover: function (piece, getImage) {
+    piece.on("rollover", $.proxy(function (evt) {
+      var image = getImage(piece);
+      if (image) {
+        piece.cursor = "pointer";
+        image.x = image.x - 20;
+        image.y = image.y - 20;
+        image.scaleX = image.scaleY = 1.2;
+        this.update = true;
+      }
+    }, this));
+
+    piece.on("rollout", $.proxy(function (evt) {
+      var image = getImage(piece);
+      if (image) {
+        piece.cursor = "";
+        image.x = image.x + 20;
+        image.y = image.y + 20;
+        image.scaleX = image.scaleY = 1;
+        this.update = true;
+      }
+    }, this));
+  }
+
 };

@@ -20,7 +20,7 @@ class Game
     };
 
     /**
-    * @var \CodingBeard\Chess\Game\AI
+    * @var \CodingBeard\Chess\Game\Ai
     */
     public ai {
         get, set
@@ -38,5 +38,21 @@ class Game
         else {
             let this->board = new Board();
         }
+    }
+
+    /**
+    * Get the turn of the board
+    */
+    public function getTurn() -> int
+    {
+        return this->board->getTurn();
+    }
+
+    /**
+    * Set the turn of the board
+    */
+    public function setTurn(const int turn)
+    {
+        return this->board->setTurn(turn);
     }
 }
