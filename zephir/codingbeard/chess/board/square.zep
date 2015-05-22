@@ -105,4 +105,14 @@ class Square
         }
     }
 
+    /**
+    * Clone the piece if this square is cloned
+    */
+    public function __clone()
+    {
+        if this->piece {
+            let this->piece = clone this->piece;
+        }
+    }
+
 }

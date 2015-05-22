@@ -20,7 +20,7 @@ class Game
     };
 
     /**
-    * @var \CodingBeard\Chess\Game\Ai
+    * @var \CodingBeard\Chess\Ai
     */
     public ai {
         get, set
@@ -38,6 +38,7 @@ class Game
         else {
             let this->board = new Board();
         }
+        let this->ai = new Ai();
     }
 
     /**
@@ -54,5 +55,38 @@ class Game
     public function setTurn(const int turn)
     {
         return this->board->setTurn(turn);
+    }
+
+    /**
+    * Alias of Ai::checkMove
+    * Check whether a move is within an array of moves
+    * @param \CodingBeard\Chess\Board\Move move
+    */
+    public function checkMove(const <\CodingBeard\Chess\Board\Move> move) -> int
+    {
+        return this->ai->checkMove(move, this->board);
+    }
+
+    /**
+    * Alias of Ai::isCheck
+    * Check whether a colour's king is in check
+    * @param int colourToCheck
+    */
+    public function isCheck(const int colourToCheck) -> bool
+    {
+        return this->ai->isCheck(this->board, colourToCheck);
+    }
+
+    /**
+    * Alias of Ai::isCheckMate
+    * Check whether a colour's king is in checkmate
+    * @param int colourToCheck
+    */
+    public function isCheckMate(const int colourToCheck) -> bool
+    {
+        if empty this->board->getPossibleMoves() {
+            this->board->setPossibleMoves();
+        }
+        return this->ai->isCheckMate(this->board, colourToCheck);
     }
 }

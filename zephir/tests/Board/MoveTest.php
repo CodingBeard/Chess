@@ -27,12 +27,12 @@ class MoveTest extends PHPUnit_Framework_TestCase
      */
     public function testConstructBare()
     {
-        $Move = new Move();
+        $Move = new Move(new Square(0, 0, new Rook(Piece::WHITE)), new Square(1, 1));
         $this->assertInstanceOf('CodingBeard\Chess\Board\Move', $Move);
 
-        $Move = new Move(new Square(0, 0), new Square(1, 1));
+        $Move = new Move(new Square(0, 0, new Rook(Piece::WHITE)), new Square(1, 1));
 
-        $this->assertEquals(new Square(0, 0), $Move->getFrom());
+        $this->assertEquals(new Square(0, 0, new Rook(Piece::WHITE)), $Move->getFrom());
         $this->assertEquals(new Square(1, 1), $Move->getTo());
         $this->assertEquals(false, $Move->getAttack());
         $this->assertEquals(false, $Move->getDoubleMove());

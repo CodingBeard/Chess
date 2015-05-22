@@ -13,13 +13,18 @@ CodingBeard.Chess = CodingBeard.Chess || {};
 /**
  * Set up a canvas on an ID, make it responsive, enable mouse events, set up a ticker
  * @param canvasId string
+ * @param width int
+ * @param height int
  * @constructor
  */
-CodingBeard.Chess.Canvas = function (canvasId) {
+CodingBeard.Chess.Canvas = function (canvasId, width, height) {
   this.canvas = document.getElementById(canvasId);
+  this.width = width;
+  this.height = height;
   this.stage = new createjs.Stage(this.canvas);
   this.alert = new createjs.Container();
   this.pieces = new createjs.Container();
+  this.highlights = new createjs.Container();
 
   this.onResize();
   window.onresize = $.proxy(function () {
@@ -51,16 +56,33 @@ CodingBeard.Chess.Canvas.prototype = {
   stage: false,
 
   /**
-   * Container for our alerts
+   * Width of the canvas
+   * @type int
+   */
+  width: false,
+
+  /**
+   * Height of the canvas
+   * @type int
+   */
+  height: false,
+
+  /**
    * @type createjs.Container
    */
-  alert: false,
+  board: false,
 
   /**
    * Container for all of the pieces
    * @type createjs.Container
    */
   pieces: false,
+
+  /**
+   * Container for all of the highlights
+   * @type createjs.Container
+   */
+  highlights: false,
 
   /**
    * Whether to update the stage on the next tick
@@ -88,15 +110,12 @@ CodingBeard.Chess.Canvas.prototype = {
     var w = window.innerWidth;
     var h = window.innerHeight - 120;
 
-    var ow = 2000;
-    var oh = 2000;
-
-    scale = Math.min(w / ow, h / oh);
+    scale = Math.min(w / this.width, h / this.height);
     this.stage.scaleX = scale;
     this.stage.scaleY = scale;
 
-    this.stage.canvas.width = ow * scale;
-    this.stage.canvas.height = oh * scale;
+    this.stage.canvas.width = this.width * scale;
+    this.stage.canvas.height = this.height * scale;
 
     this.stage.update();
   },

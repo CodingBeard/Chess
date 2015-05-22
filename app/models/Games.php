@@ -39,7 +39,17 @@ class Games extends \Phalcon\Mvc\Model
      *
      * @var \CodingBeard\Chess\Game
      */
-    public $game;
+    public $game = false;
+
+    /**
+     * Before save update models with info from $game
+     */
+    public function beforeSave()
+    {
+        if ($this->game) {
+            $this->turn = $this->game->getTurn();
+        }
+    }
 
     /**
      * Initialize method for model.

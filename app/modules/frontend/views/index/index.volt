@@ -16,7 +16,6 @@
 {% endblock %}
 
 {% block content %}
-  <div class="container">
     <canvas id="canvas">
 
     </canvas>
@@ -35,7 +34,6 @@
     </div>
 
     <a id="new-game" href="#" class="btn">New Game</a>
-  </div>
 {% endblock %}
 
 {% block javascripts %}
@@ -50,16 +48,16 @@
       connect();
 
       function connect() {
-        socket = new WebSocket('ws://chess.local.com:8080');
+        socket = new WebSocket("ws://chess.local.com:8080");
         socket.onopen = onOpen;
         socket.onclose = onClose;
         socket.onmessage = onMessage;
       }
 
-      var canvas = new CodingBeard.Chess.Canvas("canvas");
+      var canvas = new CodingBeard.Chess.Canvas("canvas", 2000, 2000);
       var board = new CodingBeard.Chess.Board(canvas);
 
-      board.drawBoard();
+      board.drawBoard(0, 0);
 
       function onOpen(e) {
         board.socket = socket;
@@ -88,6 +86,9 @@
           }
           else if (response.type == "invalidMove") {
             board.invalidMove();
+          }
+          else if (response.type == "highlightSquares") {
+            board.highlightSquares(response.params);
           }
         });
       }

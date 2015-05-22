@@ -61,45 +61,52 @@ CodingBeard.Chess.Board.prototype = {
    */
   send: function (message) {
     message.params.gameId = this.gameId;
-    console.log(JSON.stringify(message));
     this.socket.send(JSON.stringify(message));
   },
 
   /**
    * Draw the board, adding the background image and numbers/letters
+   * @param x int
+   * @param y int
    */
-  drawBoard: function () {
+  drawBoard: function (x, y) {
     var icon;
-    this.canvas.stage.addChild(this.canvas.makeBitmap("/img/chess/board.jpg"));
-    this.canvas.stage.addChild(this.canvas.pieces);
-    this.canvas.stage.addChild(this.canvas.alert);
+
+    this.canvas.board = new createjs.Container();
+    this.canvas.board.x = x;
+    this.canvas.board.y = y;
+    this.canvas.stage.addChild(this.canvas.board);
+
+    this.canvas.board.addChild(this.canvas.makeBitmap("/img/chess/board.jpg"));
+    this.canvas.board.addChild(this.canvas.pieces);
+    this.canvas.board.addChild(this.canvas.highlights);
 
     for (var i = 1; i < 9; i += 1) {
       icon = this.canvas.makeBitmap("/img/chess/letters/" + i + ".png");
       icon.x = 200 * i;
       icon.alpha = 0.7;
       icon.shadow = new createjs.Shadow("#000000", 2, 2, 10);
-      this.canvas.stage.addChild(icon);
+      this.canvas.board.addChild(icon);
 
       icon = this.canvas.makeBitmap("/img/chess/letters/" + i + ".png");
       icon.x = 200 * i;
       icon.y = 1800;
       icon.alpha = 0.7;
       icon.shadow = new createjs.Shadow("#000000", 2, 2, 10);
-      this.canvas.stage.addChild(icon);
+      this.canvas.board.addChild(icon);
 
       icon = this.canvas.makeBitmap("/img/chess/numbers/" + (9 - i) + ".png");
       icon.y = 200 * i;
       icon.alpha = 0.7;
       icon.shadow = new createjs.Shadow("#000000", 2, 2, 10);
-      this.canvas.stage.addChild(icon);
+      this.canvas.board.addChild(icon);
 
       icon = this.canvas.makeBitmap("/img/chess/numbers/" + (9 - i) + ".png");
       icon.x = 1800;
       icon.y = 200 * i;
       icon.alpha = 0.7;
       icon.shadow = new createjs.Shadow("#000000", 2, 2, 10);
-      this.canvas.stage.addChild(icon);
+      this.canvas.board.addChild(icon);
     }
 
     this.canvas.update = true;
@@ -200,6 +207,16 @@ CodingBeard.Chess.Board.prototype = {
       return piece.getChildAt(1);
     });
 
+    piece.on("rollover", $.proxy(function () {
+      if (piece.definition[0] == this.turn) {
+        this.send({action: "getMoves", params: {location: {x: piece.location.x, y: piece.location.y}}});
+      }
+    }, this));
+
+    piece.on("rollout", $.proxy(function () {
+      this.highlightSquares([]);
+    }, this));
+
     piece.on("mousedown", $.proxy(function (evt) {
       piece.offset = {x: piece.x - (evt.stageX / scale), y: piece.y - (evt.stageY / scale)};
       this.move.from = {x: piece.location.x, y: piece.location.y, piece: piece};
@@ -207,8 +224,8 @@ CodingBeard.Chess.Board.prototype = {
     }, this));
 
     piece.on("pressmove", $.proxy(function (evt) {
-      var x = Math.floor(((evt.stageX / scale)) / 200);
-      var y = Math.floor((2000 - ((evt.stageY / scale))) / 200);
+      var x = Math.floor(((evt.stageX / scale) - this.canvas.board.x) / 200);
+      var y = Math.floor((2000 - ((evt.stageY / scale) - this.canvas.board.y)) / 200);
 
       if (0 < x && x < 9 && 0 < y && y < 9) {
         this.move.to = {x: x, y: y, piece: this.getSquare(x, y)};
@@ -313,6 +330,18 @@ CodingBeard.Chess.Board.prototype = {
   },
 
   /**
+   * Highlight the moves available to a piece on click
+   * @param locations array
+   */
+  highlightSquares: function (locations) {
+    this.canvas.highlights.removeAllChildren();
+    $.each(locations, $.proxy(function (k, location) {
+      var highlight = new createjs.Graphics().beginFill("#fff").drawRect(location.x * 200, (9 - location.y) * 200, 200, 200);
+      this.canvas.highlights.addChild(new createjs.Shape()).set({graphics: highlight, alpha: 0.5});
+    }, this));
+  },
+
+  /**
    * Set the square at location xy with a piece or false
    * @param x int
    * @param y int
@@ -378,10 +407,11 @@ CodingBeard.Chess.Board.prototype = {
     console.log(move.from.x, move.from.y, "<-", move.to.x, move.to.y);
     if (move.from.piece) {
       move.from.piece.location = {x: move.from.x, y: move.from.y};
-      this.canvas.tweenToLocation(move.from.x * 200, (9 - move.from.y) * 200, move.from.piece)
+      this.canvas.tweenToLocation(move.from.x * 200, (9 - move.from.y) * 200, move.from.piece, 500)
         .call($.proxy(function () {
           this.setSquare(move.from.x, move.from.y, move.from.piece);
-          this.setSquare(move.to.x, move.to.y, false);
+          this.setSquare(move.to.x, move.to.y, move.to.piece);
+          this.canvas.update = true;
         }, this));
     }
   },

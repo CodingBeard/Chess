@@ -1,7 +1,9 @@
 <?php
 namespace CodingBeard\Chess;
 
+use CodingBeard\Chess\Board\Move;
 use CodingBeard\Chess\Board\Piece;
+use CodingBeard\Chess\Board\Square;
 use models\Games;
 use models\Players;
 use Phalcon\Mvc\User\Component;
@@ -58,7 +60,7 @@ class Websocket extends Component implements MessageComponentInterface
                 ]));
             }
             if (method_exists($this, $json->action)) {
-                $client->send($this->{$json->action}($client, $json->params));
+                $this->{$json->action}($client, $json->params);
             }
         }
     }
@@ -108,12 +110,12 @@ class Websocket extends Component implements MessageComponentInterface
 
         $this->clients[$player->id] = $client;
         echo "Player ({$player->id}) has connected\n";
-        return json_encode([
+        $client->send(json_encode([
             ['type' => 'alert', 'params' => [
                 'type' => 'toast',
                 'message' => 'Connected'
             ]]
-        ]);
+        ]));
     }
 
     /**
@@ -155,7 +157,7 @@ class Websocket extends Component implements MessageComponentInterface
 
         $this->games[$gameModel->id] = $gameModel;
 
-        return json_encode([
+        $client->send(json_encode([
             ['type' => 'alert', 'params' => [
                 'type' => 'toast',
                 'message' => 'New game started, white to go first',
@@ -167,61 +169,214 @@ class Websocket extends Component implements MessageComponentInterface
                 'id' => $gameModel->id,
                 'turn' => $gameModel->turn
             ]]
-        ]);
+        ]));
     }
 
     /**
-     * Check if a move is legal, if not send an invalid notice and move the piece back
+     * Find the game from the gamdId
      * @param ConnectionInterface $client
      * @param $params
-     * @return string
+     * @return bool|Games
      */
-    public function checkMove(ConnectionInterface $client, $params)
+    public function getGameModel(ConnectionInterface $client, $params)
     {
         /** @var Games $gameModel */
         $gameModel = $this->games[$params->gameId];
         if (!$gameModel) {
             $gameModel = Games::findFirstById($params->gameId);
         }
+        /* No gameId matching a game we have, send an error */
         if (!$gameModel) {
-            return json_encode([
+            $client->send(json_encode([
                 ['type' => 'alert', 'params' => [
                     'type' => 'modal',
                     'message' => 'You do not have a game to check a move for.' . $params->get,
                 ]]
-            ]);
+            ]));
+            return false;
+        }
+        return $gameModel;
+    }
+
+    /**
+     * Check that it is their turn, and the move is within the pieces moves, send error and revert if not
+     * @param ConnectionInterface $client
+     * @param Game $game
+     * @param Move $move
+     * @return bool
+     */
+    public function checkBasicMove(ConnectionInterface $client, $game, $move)
+    {
+        $response = $game->checkMove($move);
+        if ($response != Ai::VALID_MOVE) {
+            if ($response == Ai::NOT_TURN) {
+                $toast = "Not your turn";
+            }
+            else if ($response == Ai::INVALID_MOVE) {
+                $toast = "Invalid move";
+            }
+            $client->send(json_encode([
+                ['type' => 'alert', 'params' => [
+                    'type' => 'toast',
+                    'message' => $toast,
+                ]],
+                ['type' => 'invalidMove'],
+            ]));
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if a move is legal, if not send an invalid notice and move the piece back
+     * @param ConnectionInterface $client
+     * @param $params
+     * @return bool|string
+     */
+    public function checkMove(ConnectionInterface $client, $params)
+    {
+        /* Make sure the client has a game */
+        if (!($gameModel = $this->getGameModel($client, $params))) {
+            return false;
         }
 
         /** @var \CodingBeard\Chess\Game $game */
         $game = $gameModel->game;
+        $move = $this->moveToPhp($params->move);
 
-        if ($game->getTurn() != $params->move->from->piece[0]) {
-            return json_encode([
+        /* Make sure the move is basically correct */
+        if (!$this->checkBasicMove($client, $game, $move)) {
+            return false;
+        }
+
+        /* If the current player is in check, we need to make sure they move to get out of check, otherwise error */
+        $currentTurn = $game->getTurn();
+        if ($game->isCheck($currentTurn)) {
+            $toast = "You must escape Check";
+        }
+        /* We also need to make sure they don't put themselves in check */
+        else {
+            $toast = "You cannot enter Check";
+        }
+
+        /* Make the proposed move */
+        $game->getBoard()->makeMove($move);
+
+        /* See if the move they made put them in check, if so undo move and send error */
+        if ($game->isCheck($currentTurn)) {
+            $game->getBoard()->undoMove($move);
+            return $client->send(json_encode([
                 ['type' => 'alert', 'params' => [
                     'type' => 'toast',
-                    'message' => 'Invalid move',
+                    'message' => $toast,
                 ]],
                 ['type' => 'invalidMove'],
-            ]);
+            ]));
         }
 
+        /* They weren't in check, nor did they put themselves in check. But they have put the other player in check */
+        if ($game->isCheck($game->getTurn())) {
+            if (!$game->isCheckMate($game->getTurn())) {
+                $client->send(json_encode([
+                    ['type' => 'alert', 'params' => [
+                        'type' => 'toast',
+                        'message' => 'Check!',
+                    ]]
+                ]));
+            }
+            else {
+                $client->send(json_encode([
+                    ['type' => 'alert', 'params' => [
+                        'type' => 'toast',
+                        'message' => 'Checkmate!',
+                    ]]
+                ]));
+            }
+        }
 
         if ($game->getTurn() == Piece::WHITE) {
-            $game->setTurn(Piece::BLACK);
+            $toast = "White's turn";
         }
         else {
-            $game->setTurn(Piece::WHITE);
+            $toast = "Black's turn";
         }
+
         $gameModel->save();
-        return json_encode([
+
+        return $client->send(json_encode([
             ['type' => 'alert', 'params' => [
                 'type' => 'toast',
-                'message' => 'Valid move',
+                'message' => $toast,
             ]],
             ['type' => 'setGame', 'params' => [
                 'id' => $gameModel->id,
                 'turn' => $game->getTurn()
             ]]
-        ]);
+        ]));
+    }
+
+    /**
+     * Convert a json move to a Move object
+     * @param $jsMove
+     * @return Move
+     */
+    public function moveToPhp($jsMove)
+    {
+        if ($jsMove->to->piece) {
+            return new Move(
+                new Square(
+                    $jsMove->from->x - 1,
+                    $jsMove->from->y - 1,
+                    Piece::fromString(json_encode($jsMove->from->piece))
+                ),
+                new Square(
+                    $jsMove->to->x - 1,
+                    $jsMove->to->y - 1,
+                    Piece::fromString(json_encode($jsMove->to->piece))
+                )
+            );
+        }
+        else {
+            return new Move(
+                new Square(
+                    $jsMove->from->x - 1,
+                    $jsMove->from->y - 1,
+                    Piece::fromString(json_encode($jsMove->from->piece))
+                ),
+                new Square(
+                    $jsMove->to->x - 1,
+                    $jsMove->to->y - 1
+                )
+            );
+        }
+    }
+
+    /**
+     * Get the available moves to a piece on the board
+     * @param ConnectionInterface $client
+     * @param $params
+     * @return bool|string
+     */
+    public function getMoves(ConnectionInterface $client, $params)
+    {
+        /* Make sure the client has a game */
+        if (!($gameModel = $this->getGameModel($client, $params))) {
+            return false;
+        }
+        $game = $gameModel->game;
+        $moves = $game->getBoard()->getMoves($params->location->x - 1, $params->location->y - 1);
+
+        $toLocations = [];
+        if ($moves) {
+            /** @var Move $move */
+            foreach ($moves as $move) {
+                $toLocations[] = ['x' => $move->getTo()->getX() + 1, 'y' => $move->getTo()->getY() + 1];
+            }
+        }
+
+        $client->send(json_encode([[
+            'type' => 'highlightSquares',
+            'params' => $toLocations
+        ]]));
     }
 }

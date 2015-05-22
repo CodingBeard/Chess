@@ -54,6 +54,14 @@ class Board
     };
 
     /**
+    * An array of the moves pieces on the board can make
+    * @var array
+    */
+    public possibleMoves = [] {
+        get
+    };
+
+    /**
     * Constructor
     * @param int turn
     */
@@ -171,7 +179,7 @@ class Board
             let options = ["colour": Piece::BLACK, "row": 7];
         }
 
-        if !(from->getPiece()->getColour() == options["colour"] &&
+        if !(from->getPiece()->getType() == "King" && from->getPiece()->getColour() == options["colour"] &&
         from->getX() == 4 && from->getY() == options["row"]) {
             return moves;
         }
@@ -194,7 +202,7 @@ class Board
                 let castles[1] = new Move(from, new Square(6, options["row"]));
                 for count in [5, 6] {
                     if this->getSquare(count, options["row"])->getPiece() {
-                        unset(castles[0]);
+                        unset(castles[1]);
                     }
                 }
             }
@@ -244,6 +252,14 @@ class Board
             return moves;
         }
 
+        if lastMove->getTo()->getY() != from->getY() {
+            return moves;
+        }
+
+        if abs(lastMove->getTo()->getX() - from->getX()) != 1 {
+            return moves;
+        }
+
         if from->getPiece()->getColour() == Piece::WHITE {
             let moves[] = new Move(
                 from, new Square(lastMove->getFrom()->getX(), lastMove->getTo()->getY() + 1)
@@ -255,6 +271,38 @@ class Board
             );
         }
         return moves;
+    }
+
+    /**
+    * Populate the possibleMoves array with all the possible moves that can be taken on this board
+    * @param
+    */
+    public function setPossibleMoves(const bool turn = false) -> <\CodingBeard\Chess\Board>
+    {
+        var column, square, moves;
+
+        let this->possibleMoves = [Piece::WHITE: [], Piece::BLACK: []];
+
+        for column in this->squares {
+            for square in column {
+                if square->getPiece() {
+                    if turn {
+                        if square->getPiece()->getColour() != this->getTurn() {
+                            continue;
+                        }
+                    }
+                    let moves = this->getMoves(square->getX(), square->getY());
+                    if square->getPiece()->getColour() == Piece::WHITE && moves {
+                        let this->possibleMoves[Piece::WHITE] = array_merge(this->possibleMoves[Piece::WHITE], moves);
+                    }
+                    elseif square->getPiece()->getColour() == Piece::BLACK && moves {
+                        let this->possibleMoves[Piece::BLACK] = array_merge(this->possibleMoves[Piece::BLACK], moves);
+                    }
+                }
+            }
+        }
+
+        return this;
     }
 
     /**
@@ -277,7 +325,7 @@ class Board
             let this->turn = Piece::WHITE;
         }
 
-        let this->history[] = move;
+        let this->history[] = clone move;
     }
 
     /**
@@ -333,6 +381,24 @@ class Board
             }
         }
         return squares;
+    }
+
+    /**
+    * Clone the squares, history if this board is cloned
+    */
+    public function __clone()
+    {
+        var cKey, column, sKey, square, mKey, move;
+
+        for cKey, column in this->squares {
+            for sKey, square in column {
+                let this->squares[cKey][sKey] = clone square;
+            }
+        }
+
+        for mKey, move in this->history {
+            let this->history[mKey] = clone move;
+        }
     }
 
 }

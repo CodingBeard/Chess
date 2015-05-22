@@ -26,7 +26,10 @@
             <file>Board/testGetMoves/KnightTest.php</file>
             <file>Board/testGetMoves/RookTest.php</file>
             <file>Board/testGetMoves/PawnTest.php</file>
+            <file>Board/SetPossibleMovesTest.php</file>
+            <file>Board/CheckmateTest.php</file>
             <file>GameTest.php</file>
+            <file>AiTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>

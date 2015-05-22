@@ -151,19 +151,19 @@ class CastlingTest extends PHPUnit_Framework_TestCase
             new Move($from, new Square(2, 0)), new Move($from, new Square(6, 0)),
         ]), $board->getMoves(4, 0));
 
-        $board->setHistory([new Move(new Square(0, 0))]);
+        $board->setHistory([new Move(new Square(0, 0, new Rook(Piece::WHITE)), new Square(0, 1))]);
 
         $this->assertEquals(array_merge($whiteNormalMoves, [
             new Move($from, new Square(6, 0)),
         ]), $board->getMoves(4, 0));
 
-        $board->setHistory([new Move(new Square(7, 0))]);
+        $board->setHistory([new Move(new Square(7, 0, new Rook(Piece::WHITE)), new Square(7, 1))]);
 
         $this->assertEquals(array_merge($whiteNormalMoves, [
             new Move($from, new Square(2, 0)),
         ]), $board->getMoves(4, 0));
 
-        $board->setHistory([new Move(new Square(4, 0))]);
+        $board->setHistory([new Move(new Square(4, 0, new King(Piece::WHITE)), new Square(4, 1))]);
 
         $this->assertEquals($whiteNormalMoves, $board->getMoves(4, 0));
 
@@ -183,19 +183,19 @@ class CastlingTest extends PHPUnit_Framework_TestCase
             new Move($from, new Square(2, 7)), new Move($from, new Square(6, 7)),
         ]), $board->getMoves(4, 7));
 
-        $board->setHistory([new Move(new Square(0, 7))]);
+        $board->setHistory([new Move(new Square(0, 7, new Rook(Piece::BLACK)), new Square(0, 6))]);
 
         $this->assertEquals(array_merge($blackNormalMoves, [
             new Move($from, new Square(6, 7)),
         ]), $board->getMoves(4, 7));
 
-        $board->setHistory([new Move(new Square(7, 7))]);
+        $board->setHistory([new Move(new Square(7, 7, new Rook(Piece::BLACK)), new Square(7, 6))]);
 
         $this->assertEquals(array_merge($blackNormalMoves, [
             new Move($from, new Square(2, 7)),
         ]), $board->getMoves(4, 7));
 
-        $board->setHistory([new Move(new Square(4, 7))]);
+        $board->setHistory([new Move(new Square(4, 7, new King(Piece::BLACK)), new Square(4, 6))]);
 
         $this->assertEquals($blackNormalMoves, $board->getMoves(4, 7));
     }

@@ -112,7 +112,19 @@ class Move
                     }
                 }
             }
+            else {
+                throw new \Exception("A move's from square must contain a piece.");
+            }
         }
+    }
+
+    /**
+    * Clone the squares if this move is cloned
+    */
+    public function __clone()
+    {
+        let this->from = clone this->from;
+        let this->to = clone this->to;
     }
 
 }
