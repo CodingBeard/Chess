@@ -48,7 +48,7 @@
       connect();
 
       function connect() {
-        socket = new WebSocket("ws://chess.local.com:8080");
+        socket = new WebSocket("ws://chess.codingbeard.com:8080");
         socket.onopen = onOpen;
         socket.onclose = onClose;
         socket.onmessage = onMessage;
